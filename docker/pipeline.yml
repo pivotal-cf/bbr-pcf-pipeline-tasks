@@ -3,12 +3,20 @@ resources:
 - name: bbr-pipeline-tasks-repo
   type: git
   source:
-    repository: git@github.com:pivotal-cf/bbr-pcf-pipeline-tasks.git
+    uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
     branch: master
-    path: [docker/Dockerfile]
+    paths: [docker/Dockerfile]
 - name: bbr-pipeline-tasks-image
   type: docker-image
   source:
+    tag: final
+    repository: cloudfoundrylondon/bbr-pipeline
+    username: {{dockerhub-username}}
+    password: {{dockerhub-password}}
+- name: bbr-pipeline-tasks-image-rc
+  type: docker-image
+  source:
+    tag: release-candidate
     repository: cloudfoundrylondon/bbr-pipeline
     username: {{dockerhub-username}}
     password: {{dockerhub-password}}
@@ -20,18 +28,18 @@ jobs:
   plan:
   - get: bbr-pipeline-tasks-repo
     trigger: true
-  - put: bbr-pipeline-tasks-image
+  - put: bbr-pipeline-tasks-image-rc
     params:
-      tag: release-candidate
-      build: bbr-pipeline-tasks-repo/docker/
+      build: bbr-pipeline-tasks-repo/docker
 
 - name: test-image
   serial: true
   public: true
   plan:
   - get: bbr-pipeline-tasks-repo
+    trigger: true
     passed: [build-bbr-pipeline-tasks-image]
-  - get: bbr-pipeline-tasks-image
+  - get: bbr-pipeline-tasks-image-rc
     trigger: true
     passed: [build-bbr-pipeline-tasks-image]
     params:
@@ -62,5 +70,4 @@ jobs:
     trigger: true
   - put: bbr-pipeline-tasks-image
     params:
-      tag: final
-      build: bbr-pipeline-tasks-repo/docker/
+      build: bbr-pipeline-tasks-repo/docker
