@@ -1,11 +1,12 @@
 #!/bin/bash -eu
 
-echo "${OPSMAN_SSH_KEY}" > opsman.pem
-chmod 600 opsman.pem
+echo "${JUMPBOX_SSH_KEY}" > jumpbox.pem
+chmod 600 jumpbox.pem
+eval "$(ssh-agent)" && ssh-add jumpbox.pem
 
-. bbr-pcf-pipeline-tasks/scripts/export-director-metadata
+. $(dirname $0)/../../scripts/export-director-metadata
 
-sshuttle -e "ssh -i opsman.pem ubuntu@${OPSMAN_HOST}" 0/0 --daemon
+sshuttle -r "${JUMPBOX_USER}@${JUMPBOX_HOST}" 0/0 --daemon
 
 pushd ert-backup-artifact
   ../binary/bbr deployment --target "${BOSH_ADDRESS}" \

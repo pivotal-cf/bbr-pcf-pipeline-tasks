@@ -15,10 +15,11 @@ outputs:
 params:
   SKIP_SSL_VALIDATION: false
   OPSMAN_URL:
-  OPSMAN_HOST:
   OPSMAN_USERNAME:
   OPSMAN_PASSWORD:
-  OPSMAN_SSH_KEY:
+  JUMPBOX_USER:
+  JUMPBOX_HOST:
+  JUMPBOX_SSH_KEY:
 
 run:
   path: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.sh
