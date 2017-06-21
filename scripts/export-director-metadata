@@ -1,0 +1,22 @@
+#!/bin/bash -eu
+
+source bbr-pcf-pipeline-tasks/scripts/om-cmd
+
+om_cmd curl -p /api/installation_settings > installation_settings.json
+
+BOSH_CLIENT=$(jq -r '(.products[] | select(.guid | startswith("p-bosh-"))).uaa_credentials.identity' installation_settings.json)
+BOSH_CLIENT_SECRET=$(jq -r '(.products[] | select(.guid | startswith("p-bosh-"))).uaa_credentials.password' installation_settings.json)
+BOSH_ADDRESS=$(jq -r '.ip_assignments.assignments | to_entries[] | select(.key | startswith("p-bosh-") ).value | to_entries[] | select(.key | startswith("director-") ).value | to_entries[].value[0]' installation_settings.json)
+
+BOSH_CA_CERT_PATH="bosh.crt"
+ssh -i opsman.pem "ubuntu@${OPSMAN_HOST}" 'cat /var/tempest/workspaces/default/root_ca_certificate'> "${BOSH_CA_CERT_PATH}"
+
+# Get CF deployment guid
+om_cmd curl -p /api/v0/deployed/products > deployed_products.json
+ERT_DEPLOYMENT_NAME=$(jq -r '.[] | select( .type | contains("cf")) | .guid' "deployed_products.json")
+
+export BOSH_CLIENT
+export BOSH_CLIENT_SECRET
+export BOSH_CA_CERT_PATH
+export BOSH_ADDRESS
+export ERT_DEPLOYMENT_NAME
