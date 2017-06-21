@@ -1,0 +1,32 @@
+jobs:
+- name: export-om-installation
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+  - task: export-om-installation
+    file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
+    params:
+      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
+      OPSMAN_URL: {{opsman-url}}
+      OPSMAN_USERNAME: {{opsman-username}}
+      OPSMAN_PASSWORD: {{opsman-password}}
+  - put: om-backup-artifact
+    params:
+      file: om-installation/installation.zip
+
+resources:
+- name: bbr-pipeline-tasks-repo
+  type: git
+  source:
+    uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+    branch: master
+- name: om-backup-artifact
+  type: s3
+  source:
+    bucket: {{backup-artifact-bucket}}
+    region_name: {{storage-region}}
+    endpoint: {{storage-endpoint}}
+    access_key_id: {{storage-access-key-id}}
+    secret_access_key: {{storage-secret-access-key}}
+    versioned_file: installation.zip

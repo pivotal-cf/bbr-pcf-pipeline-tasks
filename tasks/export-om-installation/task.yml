@@ -1,0 +1,21 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundrylondon/bbr-pipeline
+    tag: final
+
+inputs:
+  - name: bbr-pipeline-tasks-repo
+outputs:
+  - name: om-installation
+
+run:
+  path: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.sh
+
+params:
+  SKIP_SSL_VALIDATION: false
+  OPSMAN_URL:
+  OPSMAN_USERNAME:
+  OPSMAN_PASSWORD:
