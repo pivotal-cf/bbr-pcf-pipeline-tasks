@@ -2,7 +2,7 @@ FROM golang:1.8
 
 RUN \
   apt-get update && \
-  apt-get install -y jq && \
+  apt-get install -y jq sshuttle && \
   rm -rf /var/lib/apt/lists/*
 
 RUN go get github.com/pivotal-cf/om

@@ -60,6 +60,7 @@ jobs:
           set -e
           which om
           which jq
+          which sshuttle
 
 - name: promote-image
   public: true
