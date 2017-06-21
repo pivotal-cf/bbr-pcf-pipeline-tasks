@@ -21,4 +21,4 @@ params:
   OPSMAN_SSH_KEY:
 
 run:
-  path: bbr-pipeline-tasks-repo/bbr-backup-ert/task.sh
+  path: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.sh
