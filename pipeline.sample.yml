@@ -15,6 +15,45 @@ jobs:
     params:
       file: om-installation/installation.zip
 
+- name: bbr-backup-ert
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+    - get: bbr-github-release
+  - task: extract-binary
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cloudfoundrylondon/bbr-pipeline
+          tag: release-candidate
+      inputs:
+      - name: bbr-github-release
+      outputs:
+      - name: binary
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          tar -xvf bbr-github-release/bbr*.tar
+          cp releases/bbr binary/
+  - task: bbr-backup-ert
+    privileged: true
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.yml
+    params:
+      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
+      OPSMAN_URL: {{opsman-url}}
+      OPSMAN_USERNAME: {{opsman-username}}
+      OPSMAN_PASSWORD: {{opsman-password}}
+      JUMPBOX_HOST: {{jumpbox-host}}
+      JUMPBOX_SSH_KEY: {{jumpbox-ssh-key}}
+  - put: ert-backup-artifact
+    params:
+      file: backup-artifact/ert-backup.tar
+
 resources:
 - name: bbr-pipeline-tasks-repo
   type: git
@@ -30,3 +69,18 @@ resources:
     access_key_id: {{storage-access-key-id}}
     secret_access_key: {{storage-secret-access-key}}
     versioned_file: installation.zip
+- name: ert-backup-artifact
+  type: s3
+  source:
+    bucket: {{backup-artifact-bucket}}
+    region_name: {{storage-region}}
+    endpoint: {{storage-endpoint}}
+    access_key_id: {{storage-access-key-id}}
+    secret_access_key: {{storage-secret-access-key}}
+    versioned_file: ert-backup.zip
+- name: bbr-github-release
+  type: github-release
+  source:
+    user: "pivotal-cf"
+    repository: bosh-backup-and-restore
+    access_token: {{github-access-token}}
