@@ -55,6 +55,46 @@ jobs:
     params:
       file: ert-backup-artifact/ert-backup.tar
 
+- name: bbr-backup-director
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+    - get: bbr-release
+  - task: extract-binary
+    tags:
+    - {{concourse-worker-tag}}
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cloudfoundrylondon/bbr-pipeline
+          tag: release-candidate
+      inputs:
+      - name: bbr-release
+      outputs:
+      - name: binary
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          tar -xvf bbr-release/bbr*.tar
+          cp releases/bbr binary/
+  - task: bbr-backup-director
+    tags:
+    - {{concourse-worker-tag}}
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
+    params:
+      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
+      OPSMAN_URL: {{opsman-url}}
+      OPSMAN_USERNAME: {{opsman-username}}
+      OPSMAN_PASSWORD: {{opsman-password}}
+  - put: director-backup-bucket
+    params:
+      file: director-backup-artifact/director-backup.tar
+
 resource_types:
 - name: pivnet
   type: docker-image
@@ -86,6 +126,15 @@ resources:
     access_key_id: {{storage-access-key-id}}
     secret_access_key: {{storage-secret-access-key}}
     versioned_file: ert-backup.tar
+- name: director-backup-bucket
+  type: s3
+  source:
+    bucket: {{backup-artifact-bucket}}
+    region_name: {{storage-region}}
+    endpoint: {{storage-endpoint}}
+    access_key_id: {{storage-access-key-id}}
+    secret_access_key: {{storage-secret-access-key}}
+    versioned_file: director-backup.tar
 - name: bbr-release
   type: pivnet
   source:
