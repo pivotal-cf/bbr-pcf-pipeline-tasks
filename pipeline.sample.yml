@@ -51,9 +51,9 @@ jobs:
       OPSMAN_URL: {{opsman-url}}
       OPSMAN_USERNAME: {{opsman-username}}
       OPSMAN_PASSWORD: {{opsman-password}}
-  - put: ert-backup-artifact
+  - put: ert-backup-bucket
     params:
-      file: backup-artifact/ert-backup.tar
+      file: ert-backup-artifact/ert-backup.tar
 
 resource_types:
 - name: pivnet
@@ -77,7 +77,7 @@ resources:
     access_key_id: {{storage-access-key-id}}
     secret_access_key: {{storage-secret-access-key}}
     versioned_file: installation.zip
-- name: ert-backup-artifact
+- name: ert-backup-bucket
   type: s3
   source:
     bucket: {{backup-artifact-bucket}}
