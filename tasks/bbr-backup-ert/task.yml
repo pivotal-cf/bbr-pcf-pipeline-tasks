@@ -17,9 +17,6 @@ params:
   OPSMAN_URL:
   OPSMAN_USERNAME:
   OPSMAN_PASSWORD:
-  JUMPBOX_USER:
-  JUMPBOX_HOST:
-  JUMPBOX_SSH_KEY:
 
 run:
   path: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.sh

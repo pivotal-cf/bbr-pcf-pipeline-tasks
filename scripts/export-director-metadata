@@ -8,8 +8,6 @@ BOSH_CLIENT="ops_manager"
 BOSH_CLIENT_SECRET=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.uaa.clients.ops_manager.secret' director_manifest.json)
 BOSH_ADDRESS=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.director.address' director_manifest.json)
 
-mkdir -p ~/.ssh && ssh-keyscan "${JUMPBOX_HOST}" > ~/.ssh/known_hosts
-
 BOSH_CA_CERT_PATH="${PWD}/bosh.crt"
 jq -r '.jobs[] | select(.name == "bosh") | .properties.director.config_server.ca_cert' director_manifest.json > "${BOSH_CA_CERT_PATH}"
 
