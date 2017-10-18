@@ -2,7 +2,7 @@
 
 This is a collection of [Concourse](https://concourse.ci) tasks for backing up a [Pivotal Cloud Foundry](https://pivotal.io/platform) installation using [bbr](https://github.com/cloudfoundry-incubator/bosh-backup-and-restore).
 
-The [time](https://github.com/concourse/time-resource) Concourse resource can be added to the pipeline to trigger backups regularly. There are a variety of storage resources such as [S3](https://github.com/concourse/s3-resource) that can be used to move backups to storage. A list of Concourse resources can be found [here](https://concourse.ci/resource-types.html). Running regular backups (at least every 24 hours) and storing multiple copies of backup artifacts in different datacenters is highly recommended.
+Running regular backups (at least every 24 hours) and storing multiple copies of backup artifacts in different datacenters is highly recommended. The [time](https://github.com/concourse/time-resource) Concourse resource can be added to the pipeline to trigger backups regularly. There are a variety of storage resources such as [S3](https://github.com/concourse/s3-resource) that can be used to move backups to storage. A list of Concourse resources can be found [here](https://concourse.ci/resource-types.html).
 
 ## Tasks
 
