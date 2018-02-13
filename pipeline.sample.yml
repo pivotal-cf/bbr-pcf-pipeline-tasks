@@ -1,143 +1,53 @@
-jobs:
-- name: export-om-installation
-  serial: true
-  plan:
-  - aggregate:
-    - get: bbr-pipeline-tasks-repo
-      trigger: true
-  - task: export-om-installation
-    file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
-    params:
-      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
-      OPSMAN_URL: {{opsman-url}}
-      OPSMAN_USERNAME: {{opsman-username}}
-      OPSMAN_PASSWORD: {{opsman-password}}
-  - put: om-backup-artifact
-    params:
-      file: om-installation/installation.zip
-
-- name: bbr-backup-ert
-  serial: true
-  plan:
-  - aggregate:
-    - get: bbr-pipeline-tasks-repo
-      trigger: true
-    - get: bbr-release
-      trigger: true
-  - task: extract-binary
-    tags:
-    - {{concourse-worker-tag}}
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundrylondon/bbr-pipeline
-          tag: release-candidate
-      inputs:
-      - name: bbr-release
-      outputs:
-      - name: binary
-      run:
-        path: sh
-        args:
-        - -c
-        - |
-          tar -xvf bbr-release/bbr*.tar
-          cp releases/bbr binary/
-  - task: bbr-backup-ert
-    tags:
-    - {{concourse-worker-tag}}
-    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.yml
-    params:
-      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
-      OPSMAN_URL: {{opsman-url}}
-      OPSMAN_USERNAME: {{opsman-username}}
-      OPSMAN_PASSWORD: {{opsman-password}}
-  - put: ert-backup-bucket
-    params:
-      file: ert-backup-artifact/ert-backup.tar
-
-- name: bbr-backup-director
-  serial: true
-  plan:
-  - aggregate:
-    - get: bbr-pipeline-tasks-repo
-      trigger: true
-    - get: bbr-release
-      trigger: true
-  - task: extract-binary
-    tags:
-    - {{concourse-worker-tag}}
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundrylondon/bbr-pipeline
-          tag: release-candidate
-      inputs:
-      - name: bbr-release
-      outputs:
-      - name: binary
-      run:
-        path: sh
-        args:
-        - -c
-        - |
-          tar -xvf bbr-release/bbr*.tar
-          cp releases/bbr binary/
-  - task: bbr-backup-director
-    tags:
-    - {{concourse-worker-tag}}
-    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
-    params:
-      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
-      OPSMAN_URL: {{opsman-url}}
-      OPSMAN_USERNAME: {{opsman-username}}
-      OPSMAN_PASSWORD: {{opsman-password}}
-  - put: director-backup-bucket
-    params:
-      file: director-backup-artifact/director-backup.tar
-
-resource_types:
-- name: pivnet
-  type: docker-image
-  source:
-    repository: pivotalcf/pivnet-resource
-    tag: latest-final
-
+groups: []
 resources:
 - name: bbr-pipeline-tasks-repo
   type: git
   source:
-    uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
     branch: master
+    uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+- name: trigger-daily-after-1am
+  type: time
+  source:
+    location: America/Chicago
+    start: 1:00 AM
+    stop: 12:59 AM
+- name: trigger-daily-after-2am
+  type: time
+  source:
+    location: America/Chicago
+    start: 2:00 AM
+    stop: 1:59 AM
+- name: trigger-daily-after-3am
+  type: time
+  source:
+    location: America/Chicago
+    start: 3:00 AM
+    stop: 2:59 AM
 - name: om-backup-artifact
   type: s3
   source:
-    bucket: {{backup-artifact-bucket}}
-    region_name: {{storage-region}}
-    endpoint: {{storage-endpoint}}
     access_key_id: {{storage-access-key-id}}
+    bucket: {{backup-artifact-bucket}}
+    endpoint: {{storage-endpoint}}
+    region_name: {{storage-region}}
     secret_access_key: {{storage-secret-access-key}}
     versioned_file: installation.zip
 - name: ert-backup-bucket
   type: s3
   source:
-    bucket: {{backup-artifact-bucket}}
-    region_name: {{storage-region}}
-    endpoint: {{storage-endpoint}}
     access_key_id: {{storage-access-key-id}}
+    bucket: {{backup-artifact-bucket}}
+    endpoint: {{storage-endpoint}}
+    region_name: {{storage-region}}
     secret_access_key: {{storage-secret-access-key}}
     versioned_file: ert-backup.tar
 - name: director-backup-bucket
   type: s3
   source:
-    bucket: {{backup-artifact-bucket}}
-    region_name: {{storage-region}}
-    endpoint: {{storage-endpoint}}
     access_key_id: {{storage-access-key-id}}
+    bucket: {{backup-artifact-bucket}}
+    endpoint: {{storage-endpoint}}
+    region_name: {{storage-region}}
     secret_access_key: {{storage-secret-access-key}}
     versioned_file: director-backup.tar
 - name: bbr-release
@@ -145,3 +55,113 @@ resources:
   source:
     api_token: {{pivnet-api-token}}
     product_slug: p-bosh-backup-and-restore
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+jobs:
+- name: export-om-installation
+  serial: true
+  plan:
+  - get: trigger-daily-after-1am
+    trigger: true
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+  - task: export-om-installation
+    file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
+    params:
+      OPSMAN_PASSWORD: {{opsman-password}}
+      OPSMAN_URL: {{opsman-url}}
+      OPSMAN_USERNAME: {{opsman-username}}
+      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
+  - put: om-backup-artifact
+    params:
+      file: om-installation/installation.zip
+- name: bbr-backup-ert
+  serial: true
+  plan:
+  - get: trigger-daily-after-3am
+    trigger: true
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+    - get: bbr-release
+  - task: extract-binary
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cloudfoundrylondon/bbr-pipeline
+          tag: release-candidate
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          tar -xvf bbr-release/bbr*.tar
+          cp releases/bbr binary/
+      inputs:
+      - name: bbr-release
+        path: ""
+      outputs:
+      - name: binary
+        path: ""
+    tags:
+    - {{concourse-worker-tag}}
+  - task: bbr-backup-ert
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.yml
+    params:
+      OPSMAN_PASSWORD: {{opsman-password}}
+      OPSMAN_URL: {{opsman-url}}
+      OPSMAN_USERNAME: {{opsman-username}}
+      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
+    tags:
+    - {{concourse-worker-tag}}
+  - put: ert-backup-bucket
+    params:
+      file: ert-backup-artifact/ert-backup.tar
+- name: bbr-backup-director
+  serial: true
+  plan:
+  - get: trigger-daily-after-2am
+    trigger: true
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+    - get: bbr-release
+  - task: extract-binary
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cloudfoundrylondon/bbr-pipeline
+          tag: release-candidate
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          tar -xvf bbr-release/bbr*.tar
+          cp releases/bbr binary/
+      inputs:
+      - name: bbr-release
+        path: ""
+      outputs:
+      - name: binary
+        path: ""
+    tags:
+    - {{concourse-worker-tag}}
+  - task: bbr-backup-director
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
+    params:
+      OPSMAN_PASSWORD: {{opsman-password}}
+      OPSMAN_URL: {{opsman-url}}
+      OPSMAN_USERNAME: {{opsman-username}}
+      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
+    tags:
+    - {{concourse-worker-tag}}
+  - put: director-backup-bucket
+    params:
+      file: director-backup-artifact/director-backup.tar
