@@ -8,10 +8,10 @@ jobs:
   - task: export-om-installation
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
     params:
-      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
-      OPSMAN_URL: {{opsman-url}}
-      OPSMAN_USERNAME: {{opsman-username}}
-      OPSMAN_PASSWORD: {{opsman-password}}
+      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+      OPSMAN_URL: ((opsman-url))
+      OPSMAN_USERNAME: ((opsman-username))
+      OPSMAN_PASSWORD: ((opsman-password))
   - put: om-backup-artifact
     params:
       file: om-installation/installation.zip
@@ -26,7 +26,7 @@ jobs:
       trigger: true
   - task: extract-binary
     tags:
-    - {{concourse-worker-tag}}
+    - ((concourse-worker-tag))
     config:
       platform: linux
       image_resource:
@@ -47,13 +47,13 @@ jobs:
           cp releases/bbr binary/
   - task: bbr-backup-ert
     tags:
-    - {{concourse-worker-tag}}
+    - ((concourse-worker-tag))
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.yml
     params:
-      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
-      OPSMAN_URL: {{opsman-url}}
-      OPSMAN_USERNAME: {{opsman-username}}
-      OPSMAN_PASSWORD: {{opsman-password}}
+      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+      OPSMAN_URL: ((opsman-url))
+      OPSMAN_USERNAME: ((opsman-username))
+      OPSMAN_PASSWORD: ((opsman-password))
   - put: ert-backup-bucket
     params:
       file: ert-backup-artifact/ert-backup.tar
@@ -68,7 +68,7 @@ jobs:
       trigger: true
   - task: extract-binary
     tags:
-    - {{concourse-worker-tag}}
+    - ((concourse-worker-tag))
     config:
       platform: linux
       image_resource:
@@ -89,13 +89,13 @@ jobs:
           cp releases/bbr binary/
   - task: bbr-backup-director
     tags:
-    - {{concourse-worker-tag}}
+    - ((concourse-worker-tag))
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
     params:
-      SKIP_SSL_VALIDATION: {{skip-ssl-validation}}
-      OPSMAN_URL: {{opsman-url}}
-      OPSMAN_USERNAME: {{opsman-username}}
-      OPSMAN_PASSWORD: {{opsman-password}}
+      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+      OPSMAN_URL: ((opsman-url))
+      OPSMAN_USERNAME: ((opsman-username))
+      OPSMAN_PASSWORD: ((opsman-password))
   - put: director-backup-bucket
     params:
       file: director-backup-artifact/director-backup.tar
@@ -116,32 +116,33 @@ resources:
 - name: om-backup-artifact
   type: s3
   source:
-    bucket: {{backup-artifact-bucket}}
-    region_name: {{storage-region}}
-    endpoint: {{storage-endpoint}}
-    access_key_id: {{storage-access-key-id}}
-    secret_access_key: {{storage-secret-access-key}}
+    bucket: ((backup-artifact-bucket))
+    region_name: ((storage-region))
+    endpoint: ((storage-endpoint))
+    access_key_id: ((storage-access-key-id))
+    secret_access_key: ((storage-secret-access-key))
     versioned_file: installation.zip
 - name: ert-backup-bucket
   type: s3
   source:
-    bucket: {{backup-artifact-bucket}}
-    region_name: {{storage-region}}
-    endpoint: {{storage-endpoint}}
-    access_key_id: {{storage-access-key-id}}
-    secret_access_key: {{storage-secret-access-key}}
+    bucket: ((backup-artifact-bucket))
+    region_name: ((storage-region))
+    endpoint: ((storage-endpoint))
+    access_key_id: ((storage-access-key-id))
+    secret_access_key: ((storage-secret-access-key))
     versioned_file: ert-backup.tar
 - name: director-backup-bucket
   type: s3
   source:
-    bucket: {{backup-artifact-bucket}}
-    region_name: {{storage-region}}
-    endpoint: {{storage-endpoint}}
-    access_key_id: {{storage-access-key-id}}
-    secret_access_key: {{storage-secret-access-key}}
+    bucket: ((backup-artifact-bucket))
+    region_name: ((storage-region))
+    endpoint: ((storage-endpoint))
+    access_key_id: ((storage-access-key-id))
+    secret_access_key: ((storage-secret-access-key))
     versioned_file: director-backup.tar
 - name: bbr-release
   type: pivnet
   source:
-    api_token: {{pivnet-api-token}}
+    api_token: ((pivnet-api-token))
     product_slug: p-bosh-backup-and-restore
+    product_version: ((bbr-version))
