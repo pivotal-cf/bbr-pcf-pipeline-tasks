@@ -4,7 +4,7 @@ This is a collection of [Concourse](https://concourse.ci) tasks for backing up a
 
 Running regular backups (at least every 24 hours) and storing multiple copies of backup artifacts in different datacenters is highly recommended. The [time](https://github.com/concourse/time-resource) Concourse resource can be added to the pipeline to trigger backups regularly. There are a variety of storage resources such as [S3](https://github.com/concourse/s3-resource) that can be used to move backups to storage. A list of Concourse resources can be found [here](https://concourse.ci/resource-types.html).
 
-To use these concourse tasks you will need to have a worker in a network which has access to your ERT or/and BOSH director. You can find an example template for deploying an external worker [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml) and instructions on how to register it with your concourse [here](https://concourse-ci.org/registering-via-tsa.html).
+To use these concourse tasks you will need to have a worker in a network which has access to your ERT or/and BOSH director. You can find an example template for deploying an external worker [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml).
 
 ## Tasks
 
