@@ -12,4 +12,5 @@ pushd director-backup-artifact
   backup
 
   tar -cvf director-backup.tar -- *
+  rm -rf ${BOSH_ADDRESS}_*
 popd
