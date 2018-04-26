@@ -145,4 +145,3 @@ resources:
   source:
     api_token: ((pivnet-api-token))
     product_slug: p-bosh-backup-and-restore
-    product_version: ((bbr-version))
