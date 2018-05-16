@@ -7,6 +7,11 @@ pushd ert-backup-artifact
   --username "${BOSH_CLIENT}" \
   --deployment "${ERT_DEPLOYMENT_NAME}" \
   --ca-cert "${BOSH_CA_CERT_PATH}" \
+  backup-cleanup
+  ../binary/bbr deployment --target "${BOSH_ADDRESS}" \
+  --username "${BOSH_CLIENT}" \
+  --deployment "${ERT_DEPLOYMENT_NAME}" \
+  --ca-cert "${BOSH_CA_CERT_PATH}" \
   backup --with-manifest
 
   tar -cvf ert-backup.tar -- *
