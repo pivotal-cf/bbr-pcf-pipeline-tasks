@@ -54,6 +54,14 @@ jobs:
       OPSMAN_URL: ((opsman-url))
       OPSMAN_USERNAME: ((opsman-username))
       OPSMAN_PASSWORD: ((opsman-password))
+    on_failure:
+      task: bbr-cleanup-ert
+      file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-ert/task.yml
+      params:
+        SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+        OPSMAN_URL: ((opsman-url))
+        OPSMAN_USERNAME: ((opsman-username))
+        OPSMAN_PASSWORD: ((opsman-password))
   - put: ert-backup-bucket
     params:
       file: ert-backup-artifact/ert-backup.tar
@@ -96,6 +104,16 @@ jobs:
       OPSMAN_URL: ((opsman-url))
       OPSMAN_USERNAME: ((opsman-username))
       OPSMAN_PASSWORD: ((opsman-password))
+    on_failure:
+      task: bbr-cleanup-director
+      tags:
+      - ((concourse-worker-tag))
+      file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.yml
+      params:
+        SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+        OPSMAN_URL: ((opsman-url))
+        OPSMAN_USERNAME: ((opsman-username))
+        OPSMAN_PASSWORD: ((opsman-password)
   - put: director-backup-bucket
     params:
       file: director-backup-artifact/director-backup.tar
