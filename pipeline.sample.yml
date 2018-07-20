@@ -113,7 +113,7 @@ jobs:
         SKIP_SSL_VALIDATION: ((skip-ssl-validation))
         OPSMAN_URL: ((opsman-url))
         OPSMAN_USERNAME: ((opsman-username))
-        OPSMAN_PASSWORD: ((opsman-password)
+        OPSMAN_PASSWORD: ((opsman-password))
   - put: director-backup-bucket
     params:
       file: director-backup-artifact/director-backup.tar
