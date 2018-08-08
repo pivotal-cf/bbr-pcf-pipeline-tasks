@@ -4,7 +4,6 @@ jobs:
   plan:
   - aggregate:
     - get: bbr-pipeline-tasks-repo
-      trigger: true
   - task: export-om-installation
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
     params:
@@ -21,9 +20,7 @@ jobs:
   plan:
   - aggregate:
     - get: bbr-pipeline-tasks-repo
-      trigger: true
     - get: bbr-release
-      trigger: true
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
@@ -71,9 +68,7 @@ jobs:
   plan:
   - aggregate:
     - get: bbr-pipeline-tasks-repo
-      trigger: true
     - get: bbr-release
-      trigger: true
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
