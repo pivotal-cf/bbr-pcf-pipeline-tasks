@@ -13,7 +13,7 @@ jq -r '.jobs[] | select(.name == "bosh") | .properties.director.config_server.ca
 
 # Get CF deployment guid
 om_cmd curl -p /api/v0/deployed/products > deployed_products.json
-ERT_DEPLOYMENT_NAME=$(jq -r '.[] | select( .type | contains("cf")) | .guid' "deployed_products.json")
+ERT_DEPLOYMENT_NAME=$(jq -r '.[] | select(.type == "cf") | .guid' "deployed_products.json")
 
 # Get UAA BBR Credentials
 om_cmd curl -p /api/v0/deployed/director/credentials/bbr_ssh_credentials > bbr_keys.json
