@@ -22,6 +22,8 @@ To use these concourse tasks you will need to have a worker in a network which h
 
 * `SKIP_SSL_VALIDATION`: if true, ssl validation will be skipped. Defaults to false
 * `OPSMAN_URL`: The OpsManager URL
+* `CLIENT_ID`: Client ID for accessing OpsManager. If empty, the OPSMAN_USERNAME and OPSMAN_PASSWORD credentials will be used
+* `CLIENT_SECRET`: Client Secret for accessing OpsManager
 * `OPSMAN_USERNAME`: The OpsManager username
 * `OPSMAN_PASSWORD`: The OpsManager password
 
@@ -42,6 +44,8 @@ N.B.: the pipeline assumes you have a tagged concourse worker deployed on the sa
 
 * `SKIP_SSL_VALIDATION`: if true, ssl validation will be skipped. Defaults to false
 * `OPSMAN_URL`: The OpsManager URL
+* `CLIENT_ID`: Client ID for accessing OpsManager. If empty, the OPSMAN_USERNAME and OPSMAN_PASSWORD credentials will be used
+* `CLIENT_SECRET`: Client Secret for accessing OpsManager
 * `OPSMAN_USERNAME`: The OpsManager username
 * `OPSMAN_PASSWORD`: The OpsManager password
 
@@ -62,6 +66,8 @@ N.B.: the pipeline assumes you have a tagged concourse worker deployed on the sa
 
 * `SKIP_SSL_VALIDATION`: if true, ssl validation will be skipped. Defaults to false
 * `OPSMAN_URL`: The OpsManager URL
+* `CLIENT_ID`: Client ID for accessing OpsManager. If empty, the OPSMAN_USERNAME and OPSMAN_PASSWORD credentials will be used
+* `CLIENT_SECRET`: Client Secret for accessing OpsManager
 * `OPSMAN_USERNAME`: The OpsManager username
 * `OPSMAN_PASSWORD`: The OpsManager password
 

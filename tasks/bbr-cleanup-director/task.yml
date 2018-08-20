@@ -15,6 +15,8 @@ params:
   OPSMAN_URL:
   OPSMAN_USERNAME:
   OPSMAN_PASSWORD:
+  CLIENT_ID:
+  CLIENT_SECRET:
 
 run:
   path: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.sh
