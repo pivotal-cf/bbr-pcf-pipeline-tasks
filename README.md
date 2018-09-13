@@ -4,8 +4,6 @@ This is a collection of [Concourse](https://concourse.ci) tasks for backing up a
 
 Running regular backups (at least every 24 hours) and storing multiple copies of backup artifacts in different datacenters is highly recommended. The [time](https://github.com/concourse/time-resource) Concourse resource can be added to the pipeline to trigger backups regularly. There are a variety of storage resources such as [S3](https://github.com/concourse/s3-resource) that can be used to move backups to storage. A list of Concourse resources can be found [here](https://concourse.ci/resource-types.html).
 
-To use these concourse tasks you will need to have a worker in a network which has access to your ERT or/and BOSH director. You can find an example template for deploying an external worker [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml).
-
 ## Tasks
 
 ### export-om-installation
@@ -29,7 +27,11 @@ To use these concourse tasks you will need to have a worker in a network which h
 
 ### bbr-backup-ert
 
-N.B.: the pipeline assumes you have a tagged concourse worker deployed on the same network as ERT, i.e., the pipeline will use the concourse worker as the jumpbox. Ensure that this worker has enough disk space to accommodate the ERT backup files.
+To use this task you will need a Concourse worker with either:
+- access to your BOSH Director and ERT/PAS VMs. You can find an example template for deploying an external worker in a different network to your Concouse deployment [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml)
+- or, provide the `OPSMAN_PRIVATE_KEY` to use an SSH tunnel via the Ops Manager VM. Please note, using an SSH tunnel may increase the time taken to drain backup artifacts from the ERT/PAS VMs. Backup artifacts can be very large and using a proxy will be a significant overhead on network performance.
+
+N.B. this task will run `bbr deployment backup` from the Concourse worker. Ensure that the Concourse worker has enough disk space to accommodate the ERT/PAS backup artifact.
 
 #### Inputs:
 
@@ -48,10 +50,14 @@ N.B.: the pipeline assumes you have a tagged concourse worker deployed on the sa
 * `CLIENT_SECRET`: Client Secret for accessing OpsManager
 * `OPSMAN_USERNAME`: The OpsManager username
 * `OPSMAN_PASSWORD`: The OpsManager password
+* `OPSMAN_PRIVATE_KEY`: (optional) The OpsManager private key. If provided, the task will export
+    BOSH_ALL_PROXY, which is used by `bbr` v1.2.6+ to create an SSH tunnel via the Ops Manager VM.
 
 ### bbr-backup-director
 
-N.B.: the pipeline assumes you have a tagged concourse worker deployed on the same network as the Director, i.e., the pipeline will use the concourse worker as the jumpbox. Ensure that this worker has enough disk space to accommodate the Director backup files.
+To use this task you will need to have a Concourse worker in a network which has access to your BOSH Director. You can find an example manifest for deploying an external worker [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml).
+
+N.B. this task will run `bbr director backup` from the Concourse worker. Ensure that the Concourse worker has enough disk space to accommodate the BOSH Director backup artifact.
 
 #### Inputs:
 
@@ -82,5 +88,5 @@ fly --target <target> \
     set-pipeline \
     --pipeline bbr-pipeline \
     --config pipeline.sample.yml \
-    --load-vars-from secret.yml
+    --load-vars-from secrets.yml
 ```
