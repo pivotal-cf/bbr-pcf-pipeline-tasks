@@ -22,7 +22,7 @@ ERT_DEPLOYMENT_NAME=$(jq -r '.[] | select(.type == "cf") | .guid' "deployed_prod
 om_cmd curl -p /api/v0/deployed/director/credentials/bbr_ssh_credentials > bbr_keys.json
 BBR_PRIVATE_KEY=$(jq -r '.credential.value.private_key_pem' bbr_keys.json)
 
-if [ ! -z "$OPSMAN_PRIVATE_KEY" ]; then
+if [ ! -z ${OPSMAN_PRIVATE_KEY:+x} ]; then
   echo -e "$OPSMAN_PRIVATE_KEY" > "${PWD}/ssh.key"
   chmod 0600 "${PWD}/ssh.key"
   opsman_private_key_path="${PWD}/ssh.key"
