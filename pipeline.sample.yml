@@ -101,6 +101,7 @@ jobs:
       OPSMAN_URL: ((opsman-url))
       OPSMAN_USERNAME: ((opsman-username))
       OPSMAN_PASSWORD: ((opsman-password))
+      OPSMAN_PRIVATE_KEY: ((opsman-private-key))
     on_failure:
       task: bbr-cleanup-director
       tags:
@@ -111,6 +112,7 @@ jobs:
         OPSMAN_URL: ((opsman-url))
         OPSMAN_USERNAME: ((opsman-username))
         OPSMAN_PASSWORD: ((opsman-password))
+        OPSMAN_PRIVATE_KEY: ((opsman-private-key))
   - put: director-backup-bucket
     params:
       file: director-backup-artifact/director-backup.tar
