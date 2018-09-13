@@ -1,6 +1,9 @@
-#!/bin/bash -eu
+#!/bin/bash
 
-source "$(dirname $BASH_SOURCE)"/om-cmd
+set -eu
+
+# shellcheck disable=SC1090
+source "$(dirname "${BASH_SOURCE[0]}")/om-cmd"
 
 om_cmd curl -p /api/v0/deployed/director/manifest > director_manifest.json
 
@@ -25,3 +28,5 @@ export BOSH_CA_CERT_PATH
 export BOSH_ADDRESS
 export ERT_DEPLOYMENT_NAME
 export BBR_PRIVATE_KEY
+
+echo ""
