@@ -17,7 +17,6 @@ jobs:
 
 - name: bbr-backup-ert
   serial: true
-  serial_group: [bbr-backup]
   plan:
   - aggregate:
     - get: bbr-pipeline-tasks-repo
@@ -68,7 +67,6 @@ jobs:
 
 - name: bbr-backup-director
   serial: true
-  serial_group: [bbr-backup]
   plan:
   - aggregate:
     - get: bbr-pipeline-tasks-repo
