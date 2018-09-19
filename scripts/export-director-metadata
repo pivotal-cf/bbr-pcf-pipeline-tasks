@@ -1,18 +1,33 @@
 #!/bin/bash
 
 set -eu
+set -o pipefail
 
 # shellcheck disable=SC1090
 source "$(dirname "${BASH_SOURCE[0]}")/om-cmd"
 
-om_cmd curl -p /api/v0/deployed/director/manifest > director_manifest.json
-
-BOSH_CLIENT="ops_manager"
-BOSH_CLIENT_SECRET=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.uaa.clients.ops_manager.secret' director_manifest.json)
-BOSH_ADDRESS=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.director.address' director_manifest.json)
-
 BOSH_CA_CERT_PATH="${PWD}/bosh.crt"
-jq -r '.jobs[] | select(.name == "bosh") | .properties.director.config_server.ca_cert' director_manifest.json > "${BOSH_CA_CERT_PATH}"
+
+if om_cmd curl -p /api/v0/deployed/director/credentials/uaa_bbr_client_credentials > /dev/null; then
+  echo "Retreving BBR client credentials for BOSH Director"
+  om_cmd curl -p /api/v0/deployed/director/credentials/uaa_bbr_client_credentials > bbr_client.json
+  BOSH_CLIENT="$(jq -r .credential.value.identity bbr_client.json)"
+  BOSH_CLIENT_SECRET="$(jq -r .credential.value.password bbr_client.json)"
+
+  bosh_product_guid="$(om_cmd curl -p /api/v0/deployed/products | jq -r '.[] | select(.type=="p-bosh") | .guid')"
+  BOSH_ADDRESS="$(om_cmd curl -p "/api/v0/deployed/products/${bosh_product_guid}/static_ips" | jq -r .[0].ips[0])"
+
+  om_cmd curl -p /api/v0/certificate_authorities | jq -r .certificate_authorities[0].cert_pem > "$BOSH_CA_CERT_PATH"
+else
+  echo "Retreving Ops Manager client credentials for BOSH Director"
+  om_cmd curl -p /api/v0/deployed/director/manifest > director_manifest.json
+
+  BOSH_CLIENT="ops_manager"
+  BOSH_CLIENT_SECRET=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.uaa.clients.ops_manager.secret' director_manifest.json)
+  BOSH_ADDRESS=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.director.address' director_manifest.json)
+
+  jq -r '.jobs[] | select(.name == "bosh") | .properties.director.config_server.ca_cert' director_manifest.json > "${BOSH_CA_CERT_PATH}"
+fi
 
 # Get CF deployment guid
 om_cmd curl -p /api/v0/deployed/products > deployed_products.json
