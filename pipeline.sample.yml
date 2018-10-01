@@ -24,24 +24,7 @@ jobs:
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundrylondon/bbr-pipeline
-          tag: release-candidate
-      inputs:
-      - name: bbr-release
-      outputs:
-      - name: binary
-      run:
-        path: sh
-        args:
-        - -c
-        - |
-          tar -xvf bbr-release/bbr*.tar
-          cp releases/bbr binary/
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-ert
     tags:
     - ((concourse-worker-tag))
@@ -74,24 +57,7 @@ jobs:
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundrylondon/bbr-pipeline
-          tag: release-candidate
-      inputs:
-      - name: bbr-release
-      outputs:
-      - name: binary
-      run:
-        path: sh
-        args:
-        - -c
-        - |
-          tar -xvf bbr-release/bbr*.tar
-          cp releases/bbr binary/
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-director
     tags:
     - ((concourse-worker-tag))
