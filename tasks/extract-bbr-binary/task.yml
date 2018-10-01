@@ -13,7 +13,7 @@ outputs:
 - name: binary
 
 run:
-  path: sh
+  path: bash
   args:
   - -c
   - |
