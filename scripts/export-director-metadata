@@ -15,7 +15,7 @@ if om_cmd curl -p /api/v0/deployed/director/credentials/uaa_bbr_client_credentia
   BOSH_CLIENT_SECRET="$(jq -r .credential.value.password bbr_client.json)"
 
   bosh_product_guid="$(om_cmd curl -p /api/v0/deployed/products | jq -r '.[] | select(.type=="p-bosh") | .guid')"
-  BOSH_ADDRESS="$(om_cmd curl -p "/api/v0/deployed/products/${bosh_product_guid}/static_ips" | jq -r .[0].ips[0])"
+  BOSH_ENVIRONMENT="$(om_cmd curl -p "/api/v0/deployed/products/${bosh_product_guid}/static_ips" | jq -r .[0].ips[0])"
 
   om_cmd curl -p /api/v0/certificate_authorities | jq -r .certificate_authorities[0].cert_pem > "$BOSH_CA_CERT_PATH"
 else
@@ -24,18 +24,14 @@ else
 
   BOSH_CLIENT="ops_manager"
   BOSH_CLIENT_SECRET=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.uaa.clients.ops_manager.secret' director_manifest.json)
-  BOSH_ADDRESS=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.director.address' director_manifest.json)
+  BOSH_ENVIRONMENT=$(jq -r '.jobs[] | select(.name == "bosh") | .properties.director.address' director_manifest.json)
 
   jq -r '.jobs[] | select(.name == "bosh") | .properties.director.config_server.ca_cert' director_manifest.json > "${BOSH_CA_CERT_PATH}"
 fi
 
-# Get CF deployment guid
-om_cmd curl -p /api/v0/deployed/products > deployed_products.json
-ERT_DEPLOYMENT_NAME=$(jq -r '.[] | select(.type == "cf") | .guid' "deployed_products.json")
-
-# Get UAA BBR Credentials
+# Get BOSH Director private key
 om_cmd curl -p /api/v0/deployed/director/credentials/bbr_ssh_credentials > bbr_keys.json
-BBR_PRIVATE_KEY=$(jq -r '.credential.value.private_key_pem' bbr_keys.json)
+BOSH_PRIVATE_KEY=$(jq -r '.credential.value.private_key_pem' bbr_keys.json)
 
 if [ ! -z ${OPSMAN_PRIVATE_KEY:+x} ]; then
   echo -e "$OPSMAN_PRIVATE_KEY" > "${PWD}/ssh.key"
@@ -49,8 +45,6 @@ fi
 export BOSH_CLIENT
 export BOSH_CLIENT_SECRET
 export BOSH_CA_CERT_PATH
-export BOSH_ADDRESS
-export ERT_DEPLOYMENT_NAME
-export BBR_PRIVATE_KEY
-
-echo ""
+export BOSH_ENVIRONMENT
+export BOSH_USERNAME="bbr"
+export BOSH_PRIVATE_KEY

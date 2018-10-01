@@ -1,9 +1,9 @@
 #!/bin/bash -eu
 
-. "$(dirname $0)"/../../scripts/export-director-metadata
+# shellcheck disable=SC1090
+source "$(dirname "$0")/../../scripts/export-director-metadata"
 
-
-./binary/bbr director --host "${BOSH_ADDRESS}" \
---username bbr \
---private-key-path <(echo "${BBR_PRIVATE_KEY}") \
-backup-cleanup
+./binary/bbr director --host "${BOSH_ENVIRONMENT}" \
+  --username "$BOSH_USERNAME" \
+  --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
+  backup-cleanup
