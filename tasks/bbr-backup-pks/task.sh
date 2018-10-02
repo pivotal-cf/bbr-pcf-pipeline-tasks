@@ -2,13 +2,15 @@
 
 set -eu
 
+scripts="$(dirname "$0")/../../scripts"
+
 # shellcheck disable=SC1090
-source "$(dirname "$0")/../../scripts/export-director-metadata"
+source "$scripts/export-director-metadata"
 # shellcheck disable=SC1090
-source "$(dirname "$0")/../../scripts/export-pks-metadata"
+source "$scripts/export-pks-metadata"
 
 pushd pks-backup-artifact
   # shellcheck disable=SC1090
-  source "$(dirname "$0")/../../scripts/deployment-backup"
+  source "../$scripts/deployment-backup"
   tar -cvf pks-backup.tar -- *
 popd
