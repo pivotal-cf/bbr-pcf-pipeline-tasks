@@ -5,5 +5,5 @@ set -o pipefail
 
 # Get CF deployment guid
 om_cmd curl -p /api/v0/deployed/products > deployed_products.json
-DEPLOYMENT_NAME=$(jq -r '.[] | select(.type == "cf") | .guid' "deployed_products.json")
+DEPLOYMENT_NAME=$(jq -r '.[] | select(.type == "pivotal-container-service") | .guid' "deployed_products.json")
 export DEPLOYMENT_NAME
