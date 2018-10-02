@@ -15,3 +15,5 @@ pushd director-backup-artifact
   # shellcheck disable=SC2086
   rm -rf ${BOSH_ENVIRONMENT}_*
 popd
+
+sudo kill "$(cat sshuttle.pid)"
