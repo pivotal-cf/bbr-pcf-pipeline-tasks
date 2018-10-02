@@ -61,6 +61,7 @@ jobs:
           which om
           which jq
           which sshuttle
+          which bosh
 
 - name: promote-image
   public: true
