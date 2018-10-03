@@ -3,9 +3,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: cloudfoundrylondon/bbr-pipeline
-    tag: final
-
+    repository: cloudfoundrylondon/backup-and-restore
 inputs:
   - name: bbr-pipeline-tasks-repo
   - name: binary
