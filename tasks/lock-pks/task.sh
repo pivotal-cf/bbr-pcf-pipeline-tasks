@@ -24,7 +24,7 @@ bosh -d "$DEPLOYMENT_NAME" ssh -c "sudo /var/vcap/bosh/bin/monit stop pks-api"
 
 TIMEOUT=60
 
-if timeout "$TIMEOUT" ensure_pksapi_stopped
+if timeout "$TIMEOUT" bash -c ensure_pksapi_stopped
 then
   echo "PKS API has been stopped"
 else
