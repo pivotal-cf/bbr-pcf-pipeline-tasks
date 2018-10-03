@@ -1,18 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
+scripts="$(dirname "$0")/../../scripts"
+
 # shellcheck disable=SC1090
-source "$(dirname "$0")/../../scripts/export-director-metadata"
+source "$scripts/export-director-metadata"
 # shellcheck disable=SC1090
-source "$(dirname "$0")/../../scripts/export-cf-metadata"
+source "$scripts/export-cf-metadata"
 
 pushd ert-backup-artifact
-  ../binary/bbr deployment --target "$BOSH_ENVIRONMENT" \
-    --username "$BOSH_CLIENT" \
-    --deployment "$CF_DEPLOYMENT_NAME" \
-    --ca-cert "$BOSH_CA_CERT_PATH" \
-    backup --with-manifest
-
+  # shellcheck disable=SC1090
+  source "../$scripts/deployment-backup"
   tar -cvf ert-backup.tar -- *
 popd

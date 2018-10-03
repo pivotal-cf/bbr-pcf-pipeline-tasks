@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+../binary/bbr deployment --target "$BOSH_ENVIRONMENT" \
+  --username "$BOSH_CLIENT" \
+  --deployment "$DEPLOYMENT_NAME" \
+  --ca-cert "$BOSH_CA_CERT_PATH" \
+  backup --with-manifest

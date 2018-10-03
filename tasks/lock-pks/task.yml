@@ -3,14 +3,9 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: cloudfoundrylondon/bbr-pipeline
-    tag: final
-
+    repository: cloudfoundrylondon/backup-and-restore
 inputs:
   - name: bbr-pipeline-tasks-repo
-  - name: binary
-outputs:
-  - name: director-backup-artifact
 
 params:
   SKIP_SSL_VALIDATION: false
@@ -22,4 +17,4 @@ params:
   CLIENT_SECRET:
 
 run:
-  path: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.sh
+  path: bbr-pipeline-tasks-repo/tasks/lock-pks/task.sh
