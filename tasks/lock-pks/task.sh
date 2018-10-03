@@ -10,6 +10,8 @@ ensure_pksapi_stopped() {
     output=$(bosh -d "$DEPLOYMENT_NAME" ssh -c 'sudo /var/vcap/bosh/bin/monit summary' | grep pks-api)
   done
 }
+# timeout is a command and executed as a subprocess, so ensure_pksapi_stopped must be exported
+export -f ensure_pksapi_stopped
 
 scripts="$(dirname "$0")/../../scripts"
 
