@@ -6,7 +6,6 @@ image_resource:
     repository: cloudfoundrylondon/backup-and-restore
 inputs:
   - name: bbr-pipeline-tasks-repo
-  - name: binary
 
 params:
   SKIP_SSL_VALIDATION: false
