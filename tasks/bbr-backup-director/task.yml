@@ -4,7 +4,6 @@ image_resource:
   type: docker-image
   source:
     repository: cloudfoundrylondon/backup-and-restore
-    tag: final
 
 inputs:
   - name: bbr-pipeline-tasks-repo
