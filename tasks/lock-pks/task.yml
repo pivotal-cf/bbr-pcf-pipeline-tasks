@@ -13,6 +13,8 @@ params:
   OPSMAN_USERNAME:
   OPSMAN_PASSWORD:
   OPSMAN_PRIVATE_KEY:
+  CLIENT_ID:
+  CLIENT_SECRET:
 
 run:
   path: bbr-pipeline-tasks-repo/tasks/lock-pks/task.sh
