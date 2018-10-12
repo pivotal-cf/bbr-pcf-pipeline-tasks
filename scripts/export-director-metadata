@@ -38,7 +38,8 @@ if [ ! -z ${OPSMAN_PRIVATE_KEY:+x} ]; then
   chmod 0600 "${PWD}/ssh.key"
   opsman_private_key_path="${PWD}/ssh.key"
   opsman_host="$(basename "$OPSMAN_URL")"
-  export BOSH_ALL_PROXY="ssh+socks5://ubuntu@${opsman_host}:22?private-key=${opsman_private_key_path}"
+  ssh -4 -D 5000 -fNC "ubuntu@${opsman_host}" -i "${opsman_private_key_path}" -o ServerAliveInterval=60 -o StrictHostKeyChecking=no
+  export BOSH_ALL_PROXY=socks5://localhost:5000
   echo "Using BOSH_ALL_PROXY"
 fi
 
