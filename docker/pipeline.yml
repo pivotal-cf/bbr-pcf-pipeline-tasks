@@ -11,15 +11,15 @@ resources:
   source:
     tag: final
     repository: cloudfoundrylondon/bbr-pipeline
-    username: {{dockerhub-username}}
-    password: {{dockerhub-password}}
+    username: ((dockerhub-username))
+    password: ((dockerhub-password))
 - name: bbr-pipeline-tasks-image-rc
   type: docker-image
   source:
     tag: release-candidate
     repository: cloudfoundrylondon/bbr-pipeline
-    username: {{dockerhub-username}}
-    password: {{dockerhub-password}}
+    username: ((dockerhub-username))
+    password: ((dockerhub-password))
 
 jobs:
 - name: build-bbr-pipeline-tasks-image
@@ -62,6 +62,7 @@ jobs:
           which jq
           which sshuttle
           which bosh
+          which ssh
 
 - name: promote-image
   public: true
