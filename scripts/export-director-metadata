@@ -42,7 +42,7 @@ if [ ! -z ${OPSMAN_PRIVATE_KEY:+x} ]; then
   chmod 0600 "${PWD}/ssh.key"
   opsman_private_key_path="${PWD}/ssh.key"
   opsman_host="$(basename "$OPSMAN_URL")"
-  ssh -4 -D 5000 -fNC "ubuntu@${opsman_host}" -i "${opsman_private_key_path}" -o ServerAliveInterval=60 -o StrictHostKeyChecking=no
+  ssh -4 -D 5000 -NC "ubuntu@${opsman_host}" -i "${opsman_private_key_path}" -o ServerAliveInterval=60 -o StrictHostKeyChecking=no &
   ssh_socks_proxy_pid="$!"
   trap cleanup_socks_proxy EXIT
   export BOSH_ALL_PROXY=socks5://localhost:5000
