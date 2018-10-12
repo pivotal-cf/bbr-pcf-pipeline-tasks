@@ -60,7 +60,6 @@ jobs:
           set -e
           which om
           which jq
-          which sshuttle
           which bosh
           which ssh
 
