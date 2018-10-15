@@ -27,8 +27,8 @@ Running regular backups (at least every 24 hours) and storing multiple copies of
 
 ### bbr-backup-ert
 
-To use this task you will need a Concourse worker with either:
-- access to your BOSH Director and ERT/PAS VMs. You can find an example template for deploying an external worker in a different network to your Concouse deployment [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml)
+To use this task you will need either:
+- a Concourse worker with access to your BOSH Director and ERT/PAS VMs. You can find an example template for deploying an external worker in a different network to your Concouse deployment [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml)
 - or, provide the `OPSMAN_PRIVATE_KEY` to use an SSH tunnel via the Ops Manager VM. Please note, using an SSH tunnel may increase the time taken to drain backup artifacts from the ERT/PAS VMs. Backup artifacts can be very large and using a proxy will be a significant overhead on network performance.
 
 N.B. this task will run `bbr deployment backup` from the Concourse worker. Ensure that the Concourse worker has enough disk space to accommodate the ERT/PAS backup artifact.
@@ -55,7 +55,9 @@ N.B. this task will run `bbr deployment backup` from the Concourse worker. Ensur
 
 ### bbr-backup-director
 
-To use this task you will need to have a Concourse worker in a network which has access to your BOSH Director. You can find an example manifest for deploying an external worker [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml).
+To use this task you will need either:
+- a Concourse worker with access to your BOSH Director. You can find an example template for deploying an external worker in a different network to your Concouse deployment [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml)
+- or, provide the `OPSMAN_PRIVATE_KEY` to use an SSH tunnel via the Ops Manager VM. Please note, using an SSH tunnel may increase the time taken to drain backup artifacts from the BOSH director. Backup artifacts can be very large and using a proxy will be a significant overhead on network performance.
 
 N.B. this task will run `bbr director backup` from the Concourse worker. Ensure that the Concourse worker has enough disk space to accommodate the BOSH Director backup artifact.
 
@@ -76,6 +78,8 @@ N.B. this task will run `bbr director backup` from the Concourse worker. Ensure 
 * `CLIENT_SECRET`: Client Secret for accessing OpsManager
 * `OPSMAN_USERNAME`: The OpsManager username
 * `OPSMAN_PASSWORD`: The OpsManager password
+* `OPSMAN_PRIVATE_KEY`: (optional) The OpsManager private key. If provided, the task will export
+    BOSH_ALL_PROXY, which is used by `bbr` v1.2.6+ to create an SSH tunnel via the Ops Manager VM.
 
 ## Example pipeline
 
