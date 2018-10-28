@@ -9,8 +9,6 @@ image_resource:
 inputs:
   - name: bbr-pipeline-tasks-repo
   - name: binary
-outputs:
-  - name: ert-backup-artifact
 
 params:
   SKIP_SSL_VALIDATION: false
@@ -22,4 +20,4 @@ params:
   CLIENT_SECRET:
 
 run:
-  path: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.sh
+  path: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pas/task.sh

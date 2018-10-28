@@ -9,8 +9,8 @@ source "$scripts/export-director-metadata"
 # shellcheck disable=SC1090
 source "$scripts/export-cf-metadata"
 
-pushd ert-backup-artifact
+pushd pas-backup-artifact
   # shellcheck disable=SC1090
   source "../$scripts/deployment-backup"
-  tar -cvf ert-backup.tar -- *
+  tar -cvf pas-backup.tar -- *
 popd
