@@ -4,4 +4,4 @@
   --username "$BOSH_CLIENT" \
   --deployment "$DEPLOYMENT_NAME" \
   --ca-cert "$BOSH_CA_CERT_PATH" \
-  cleanup --with-manifest
+  backup-cleanup
