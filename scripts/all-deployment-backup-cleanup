@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+./binary/bbr deployment --target "$BOSH_ENVIRONMENT" \
+  --username "$BOSH_TEAM_CLIENT" \
+  --password "$BOSH_TEAM_CLIENT_SECRET" \
+  --ca-cert "$BOSH_CA_CERT_PATH" \
+  --all-deployments \
+  backup-cleanup
