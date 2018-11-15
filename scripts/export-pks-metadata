@@ -7,3 +7,8 @@ set -o pipefail
 om_cmd curl -p /api/v0/deployed/products > deployed_products.json
 DEPLOYMENT_NAME=$(jq -r '.[] | select(.type == "pivotal-container-service") | .guid' "deployed_products.json")
 export DEPLOYMENT_NAME
+
+
+om_cmd curl -p /api/v0/deployed/products/${DEPLOYMENT_NAME}/uaa_client_credentials > bosh_team_creds.json
+BOSH_TEAM_CLIENT="$(jq -r .uaa_client_name bosh_team_creds.json)"
+BOSH_TEAM_CLIENT_SECRET="$(jq -r .uaa_client_secret bosh_team_creds.json)"
