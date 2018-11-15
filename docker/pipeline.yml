@@ -20,12 +20,19 @@ resources:
     repository: cloudfoundrylondon/bbr-pipeline
     username: ((dockerhub-username))
     password: ((dockerhub-password))
+- name: ubuntu-xenial
+  type: docker-image
+  source:
+    repository: ubuntu
+    tag: xenial
 
 jobs:
 - name: build-bbr-pipeline-tasks-image
   public: true
   serial: true
   plan:
+  - get: ubuntu-xenial
+    trigger: true
   - get: bbr-pipeline-tasks-repo
     trigger: true
   - put: bbr-pipeline-tasks-image-rc
