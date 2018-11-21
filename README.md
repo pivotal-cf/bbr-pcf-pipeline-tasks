@@ -38,9 +38,9 @@ The backup tasks will run `bbr` commands on your Concourse worker. Ensure that y
 
 ---
 
-## Sample pipelines
+## Example pipelines
 
-Sample pipelines and secrets are provided as examples of how to run the tasks to back up PAS or PKS.
+Example pipelines and secrets are provided to show how to use these tasks to back up PAS or PKS.
 
 ### Triggers
 
