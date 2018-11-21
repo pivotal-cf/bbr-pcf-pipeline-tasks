@@ -99,7 +99,7 @@ resources:
 - name: om-backup-artifact
   type: s3
   source:
-    bucket: ((backup-artifact-bucket))
+    bucket: ((storage-backup-bucket))
     region_name: ((storage-region))
     endpoint: ((storage-endpoint))
     access_key_id: ((storage-access-key-id))
@@ -108,7 +108,7 @@ resources:
 - name: ert-backup-bucket
   type: s3
   source:
-    bucket: ((backup-artifact-bucket))
+    bucket: ((storage-backup-bucket))
     region_name: ((storage-region))
     endpoint: ((storage-endpoint))
     access_key_id: ((storage-access-key-id))
@@ -117,7 +117,7 @@ resources:
 - name: director-backup-bucket
   type: s3
   source:
-    bucket: ((backup-artifact-bucket))
+    bucket: ((storage-backup-bucket))
     region_name: ((storage-region))
     endpoint: ((storage-endpoint))
     access_key_id: ((storage-access-key-id))
