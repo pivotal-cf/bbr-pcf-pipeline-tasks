@@ -48,7 +48,7 @@ if [ ! -z ${OPSMAN_PRIVATE_KEY:+x} ]; then
   export BOSH_ALL_PROXY=socks5://localhost:5000
   echo "Using BOSH_ALL_PROXY"
   echo "sleeping for 5 secs to establish connection"
-  sleep 5s
+  sleep 10s
 fi
 
 export BOSH_CLIENT
