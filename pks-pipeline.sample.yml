@@ -1,0 +1,181 @@
+---
+opsman_credentials: &opsman_credentials
+  SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+  OPSMAN_URL: ((opsman-url))
+  OPSMAN_USERNAME: ((opsman-username))
+  OPSMAN_PASSWORD: ((opsman-password))
+  OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+
+s3_credentials: &s3_credentials
+  bucket: ((storage-backup-bucket))
+  region_name: ((storage-region))
+  access_key_id: ((storage-access-key-id))
+  secret_access_key: ((storage-secret-access-key))
+  endpoint: ((storage-endpoint))
+
+jobs:
+- name: export-om-installation
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-release
+    - get: bbr-pipeline-tasks-repo
+  - task: export-om-installation
+    file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
+    params:
+      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+      OPSMAN_URL: ((opsman-url))
+      OPSMAN_USERNAME: ((opsman-username))
+      OPSMAN_PASSWORD: ((opsman-password))
+  - put: om-backup-bucket
+    params:
+      file: om-installation/installation.zip
+
+- name: lock-pks
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-release
+      passed: [export-om-installation]
+    - get: bbr-pipeline-tasks-repo
+      passed: [export-om-installation]
+  - task: lock-pks
+    file: bbr-pipeline-tasks-repo/tasks/lock-pks/task.yml
+    params:
+      <<: *opsman_credentials
+
+- name: bbr-backup-director
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-release
+      passed: [lock-pks]
+    - get: bbr-pipeline-tasks-repo
+      passed: [lock-pks]
+  - task: extract-binary
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
+  - task: bbr-backup-director
+    privileged: true
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
+    params:
+      <<: *opsman_credentials
+    on_failure:
+      aggregate:
+      - task: bbr-cleanup-director
+        file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.yml
+        params:
+          <<: *opsman_credentials
+      - task: unlock-pks
+        file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
+        params:
+          <<: *opsman_credentials
+  - put: director-backup-bucket
+    params:
+      file: director-backup-artifact/director-backup.tar
+
+- name: bbr-backup-pks
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-release
+      passed: [bbr-backup-director]
+    - get: bbr-pipeline-tasks-repo
+      passed: [bbr-backup-director]
+  - task: extract-binary
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
+  - task: bbr-backup-pks
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pks/task.yml
+    params:
+      <<: *opsman_credentials
+    on_failure:
+      aggregate:
+      - task: bbr-cleanup-pks
+        file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pks/task.yml
+        params:
+          <<: *opsman_credentials
+      - task: unlock-pks
+        file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
+        params:
+          <<: *opsman_credentials
+  - put: pks-backup-bucket
+    params:
+      file: pks-backup-artifact/pks-backup.tar
+
+- name: bbr-backup-pks-clusters
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-release
+      passed: [bbr-backup-pks]
+    - get: bbr-pipeline-tasks-repo
+      passed: [bbr-backup-pks]
+  - task: extract-binary
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
+  - task: bbr-backup-pks-clusters
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pks-clusters/task.yml
+    params:
+      <<: *opsman_credentials
+    on_failure:
+      aggregate:
+      - task: unlock-pks
+        file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
+        params:
+          <<: *opsman_credentials
+      - task: bbr-cleanup-pks-clusters
+        file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pks-clusters/task.yml
+        params:
+          <<: *opsman_credentials
+  - put: pks-backup-bucket
+    params:
+      file: pks-clusters-backup-artifact/pks-clusters-backup.tar
+
+- name: unlock-pks
+  serial: true
+  plan:
+  - aggregate:
+    - get: bbr-release
+      passed: [bbr-backup-pks-clusters]
+    - get: bbr-pipeline-tasks-repo
+      passed: [bbr-backup-pks-clusters]
+  - task: unlock-pks
+    file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
+    params:
+      <<: *opsman_credentials
+
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+
+resources:
+- name: bbr-pipeline-tasks-repo
+  type: git
+  source:
+    uri:  https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+    branch: master
+
+- name: bbr-release
+  type: pivnet
+  source:
+    api_token: ((pivnet-api-token))
+    product_slug: p-bosh-backup-and-restore
+
+- name: om-backup-bucket
+  type: s3
+  source:
+    <<: *s3_credentials
+    versioned_file: installation.zip
+
+- name: director-backup-bucket
+  type: s3
+  source:
+    <<: *s3_credentials
+    versioned_file: director-backup.tar
+
+- name: pks-backup-bucket
+  type: s3
+  source:
+    <<: *s3_credentials
+    versioned_file: pks-backup.tar
