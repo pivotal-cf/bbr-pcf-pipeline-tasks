@@ -5,12 +5,15 @@ image_resource:
   type: docker-image
   source:
     repository: cloudfoundrylondon/bbr-pipeline
-    tag: release-candidate
+    tag: final
 
 inputs:
-- name: bbr-release
+    # Contains the latest release of bbr from GitHub
+  - name: bbr-release
+
 outputs:
-- name: binary
+    # Directory containing the bbr executable to use in other tasks
+  - name: binary
 
 run:
   path: bash
