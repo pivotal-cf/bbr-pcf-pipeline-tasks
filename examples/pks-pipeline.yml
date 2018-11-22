@@ -36,9 +36,7 @@ jobs:
   plan:
   - aggregate:
     - get: bbr-release
-      passed: [export-om-installation]
     - get: bbr-pipeline-tasks-repo
-      passed: [export-om-installation]
   - task: lock-pks
     file: bbr-pipeline-tasks-repo/tasks/lock-pks/task.yml
     params:
