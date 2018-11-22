@@ -61,7 +61,7 @@ jobs:
           repository: cloudfoundrylondon/bbr-pipeline
           tag: release-candidate
       run:
-        path: sh
+        path: bash
         args:
         - -c
         - |
@@ -80,6 +80,27 @@ jobs:
   - get: bbr-pipeline-tasks-image-rc
     trigger: true
     passed: [test-image]
+    params:
+      save: true
+  - task: write-tag-file
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cloudfoundrylondon/bbr-pipeline
+          tag: release-candidate
+      outputs:
+      - name: tag_file
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          set -e
+          mkdir -p tag_file/
+          echo "final" > tag_file/tag
   - put: bbr-pipeline-tasks-image
     params:
-      additional_tags: final
+      load: bbr-pipeline-tasks-image-rc
+      tag_file: tag_file/tag
