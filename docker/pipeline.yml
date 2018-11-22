@@ -6,6 +6,7 @@ resources:
     uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
     branch: master
     paths: [docker/Dockerfile]
+
 - name: bbr-pipeline-tasks-image
   type: docker-image
   source:
@@ -13,6 +14,7 @@ resources:
     repository: cloudfoundrylondon/bbr-pipeline
     username: ((dockerhub-username))
     password: ((dockerhub-password))
+
 - name: bbr-pipeline-tasks-image-rc
   type: docker-image
   source:
@@ -20,6 +22,7 @@ resources:
     repository: cloudfoundrylondon/bbr-pipeline
     username: ((dockerhub-username))
     password: ((dockerhub-password))
+
 - name: ubuntu-xenial
   type: docker-image
   source:
@@ -44,8 +47,6 @@ jobs:
   public: true
   plan:
   - get: bbr-pipeline-tasks-repo
-    trigger: true
-    passed: [build-bbr-pipeline-tasks-image]
   - get: bbr-pipeline-tasks-image-rc
     trigger: true
     passed: [build-bbr-pipeline-tasks-image]
@@ -71,13 +72,14 @@ jobs:
           which ssh
           which fly
           which nc
+
 - name: promote-image
   public: true
   serial: true
   plan:
-  - get: bbr-pipeline-tasks-repo
-    passed: [test-image]
+  - get: bbr-pipeline-tasks-image-rc
     trigger: true
+    passed: [test-image]
   - put: bbr-pipeline-tasks-image
     params:
-      build: bbr-pipeline-tasks-repo/docker
+      additional_tags: final
