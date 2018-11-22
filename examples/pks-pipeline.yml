@@ -76,9 +76,9 @@ jobs:
   plan:
   - aggregate:
     - get: bbr-release
-      passed: [bbr-backup-director]
+      passed: [lock-pks]
     - get: bbr-pipeline-tasks-repo
-      passed: [bbr-backup-director]
+      passed: [lock-pks]
   - task: extract-binary
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-pks
@@ -104,9 +104,9 @@ jobs:
   plan:
   - aggregate:
     - get: bbr-release
-      passed: [bbr-backup-pks]
+      passed: [lock-pks]
     - get: bbr-pipeline-tasks-repo
-      passed: [bbr-backup-pks]
+      passed: [lock-pks]
   - task: extract-binary
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-pks-clusters
@@ -132,9 +132,15 @@ jobs:
   plan:
   - aggregate:
     - get: bbr-release
-      passed: [bbr-backup-pks-clusters]
+      passed:
+      - bbr-backup-director
+      - bbr-backup-pks
+      - bbr-backup-pks-clusters
     - get: bbr-pipeline-tasks-repo
-      passed: [bbr-backup-pks-clusters]
+      passed:
+      - bbr-backup-director
+      - bbr-backup-pks
+      - bbr-backup-pks-clusters
   - task: unlock-pks
     file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
     params:
