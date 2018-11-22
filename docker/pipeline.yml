@@ -70,6 +70,7 @@ jobs:
           which bosh
           which ssh
           which fly
+          which nc
 - name: promote-image
   public: true
   serial: true
