@@ -1,5 +1,6 @@
 ---
 platform: linux
+
 image_resource:
   type: docker-image
   source:
@@ -8,16 +9,25 @@ image_resource:
 
 inputs:
   - name: bbr-pipeline-tasks-repo
+
 outputs:
+    # Contains exported Ops Manager installation settings in `installation.zip`
   - name: om-installation
 
 run:
   path: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.sh
 
 params:
-  SKIP_SSL_VALIDATION: false
+  # The Ops Manager URL, e.g. https://pcf.example.com
   OPSMAN_URL:
-  OPSMAN_USERNAME:
-  OPSMAN_PASSWORD:
+
+  # If true, SSL validation will be skipped when connecting to Ops Manager API
+  SKIP_SSL_VALIDATION: false
+
+  # Client credentials for Ops Manager API. If empty, user credentials will be used
   CLIENT_ID:
   CLIENT_SECRET:
+
+  # User credentials for Ops Manager API
+  OPSMAN_USERNAME:
+  OPSMAN_PASSWORD:

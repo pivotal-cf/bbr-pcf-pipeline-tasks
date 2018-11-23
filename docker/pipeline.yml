@@ -6,6 +6,7 @@ resources:
     uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
     branch: master
     paths: [docker/Dockerfile]
+
 - name: bbr-pipeline-tasks-image
   type: docker-image
   source:
@@ -13,6 +14,7 @@ resources:
     repository: cloudfoundrylondon/bbr-pipeline
     username: ((dockerhub-username))
     password: ((dockerhub-password))
+
 - name: bbr-pipeline-tasks-image-rc
   type: docker-image
   source:
@@ -20,6 +22,7 @@ resources:
     repository: cloudfoundrylondon/bbr-pipeline
     username: ((dockerhub-username))
     password: ((dockerhub-password))
+
 - name: ubuntu-xenial
   type: docker-image
   source:
@@ -44,8 +47,6 @@ jobs:
   public: true
   plan:
   - get: bbr-pipeline-tasks-repo
-    trigger: true
-    passed: [build-bbr-pipeline-tasks-image]
   - get: bbr-pipeline-tasks-image-rc
     trigger: true
     passed: [build-bbr-pipeline-tasks-image]
@@ -60,7 +61,7 @@ jobs:
           repository: cloudfoundrylondon/bbr-pipeline
           tag: release-candidate
       run:
-        path: sh
+        path: bash
         args:
         - -c
         - |
@@ -69,14 +70,37 @@ jobs:
           which jq
           which bosh
           which ssh
+          which fly
+          which nc
 
 - name: promote-image
   public: true
   serial: true
   plan:
-  - get: bbr-pipeline-tasks-repo
-    passed: [test-image]
+  - get: bbr-pipeline-tasks-image-rc
     trigger: true
+    passed: [test-image]
+    params:
+      save: true
+  - task: write-tag-file
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cloudfoundrylondon/bbr-pipeline
+          tag: release-candidate
+      outputs:
+      - name: tag_file
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          set -e
+          mkdir -p tag_file/
+          echo "final" > tag_file/tag
   - put: bbr-pipeline-tasks-image
     params:
-      build: bbr-pipeline-tasks-repo/docker
+      load: bbr-pipeline-tasks-image-rc
+      tag_file: tag_file/tag
