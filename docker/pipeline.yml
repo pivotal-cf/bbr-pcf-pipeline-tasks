@@ -1,13 +1,13 @@
 ---
 resources:
-- name: bbr-pipeline-tasks-repo
+- name: dockerfile
   type: git
   source:
     uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
     branch: master
     paths: [docker/Dockerfile]
 
-- name: bbr-pipeline-tasks-image
+- name: bbr-pipeline-final
   type: docker-image
   source:
     tag: final
@@ -15,7 +15,7 @@ resources:
     username: ((dockerhub-username))
     password: ((dockerhub-password))
 
-- name: bbr-pipeline-tasks-image-rc
+- name: bbr-pipeline-rc
   type: docker-image
   source:
     tag: release-candidate
@@ -30,25 +30,25 @@ resources:
     tag: xenial
 
 jobs:
-- name: build-bbr-pipeline-tasks-image
+- name: build-rc
   public: true
   serial: true
   plan:
   - get: ubuntu-xenial
     trigger: true
-  - get: bbr-pipeline-tasks-repo
+  - get: dockerfile
     trigger: true
-  - put: bbr-pipeline-tasks-image-rc
+  - put: bbr-pipeline-rc
     params:
-      build: bbr-pipeline-tasks-repo/docker
+      build: dockerfile/docker
 
-- name: test-image
+- name: test-rc
   serial: true
   public: true
   plan:
-  - get: bbr-pipeline-tasks-image-rc
+  - get: bbr-pipeline-rc
     trigger: true
-    passed: [build-bbr-pipeline-tasks-image]
+    passed: [build-rc]
     params:
       skip_download: true
   - task: test-for-required-binaries
@@ -72,13 +72,13 @@ jobs:
           which fly
           which nc
 
-- name: promote-image
+- name: promote-rc
   public: true
   serial: true
   plan:
-  - get: bbr-pipeline-tasks-image-rc
+  - get: bbr-pipeline-rc
     trigger: true
-    passed: [test-image]
+    passed: [test-rc]
     params:
       save: true
   - task: write-tag-file
@@ -99,7 +99,7 @@ jobs:
           set -e
           mkdir -p tag_file/
           echo "final" > tag_file/tag
-  - put: bbr-pipeline-tasks-image
+  - put: bbr-pipeline-final
     params:
-      load: bbr-pipeline-tasks-image-rc
+      load: bbr-pipeline-rc
       tag_file: tag_file/tag
