@@ -46,7 +46,6 @@ jobs:
   serial: true
   public: true
   plan:
-  - get: bbr-pipeline-tasks-repo
   - get: bbr-pipeline-tasks-image-rc
     trigger: true
     passed: [build-bbr-pipeline-tasks-image]
