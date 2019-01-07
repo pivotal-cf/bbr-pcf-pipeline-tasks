@@ -94,7 +94,7 @@ jobs:
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
-  - task: backup-director-to-azure
+  - task: bbr-backup-director-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director-to-azure/task.yml
     params:
       <<: *opsman_credentials
