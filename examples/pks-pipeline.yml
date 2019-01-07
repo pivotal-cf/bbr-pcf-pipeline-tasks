@@ -24,7 +24,8 @@ resources:
 - name: bbr-pipeline-tasks-repo
   type: git
   source:
-    uri:  https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+    uri: git@github.com:pivotal-cf/bbr-pcf-pipeline-tasks.git
+    private_key: ((git-private-key))
     branch: master
 
 - name: bbr-release
