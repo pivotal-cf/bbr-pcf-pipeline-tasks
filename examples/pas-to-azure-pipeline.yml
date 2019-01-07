@@ -61,7 +61,7 @@ jobs:
 
 # keep the backup as a single unit to avoid copying the backup between container volumes
 # even resources store a copy so the work must be self contained
-- name: backup-ert-to-azure
+- name: bbr-backup-ert-to-azure
   plan:
   - aggregate:
     - get: bbr-release
@@ -82,7 +82,7 @@ jobs:
 
 # keep the backup as a single unit to avoid copying the backup between container volumes
 # even resources store a copy so the work must be self contained
-- name: backup-director-to-azure
+- name: bbr-backup-director-to-azure
   plan:
   - aggregate:
     - get: bbr-release
