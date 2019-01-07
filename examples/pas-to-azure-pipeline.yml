@@ -1,0 +1,44 @@
+resource_types:
+# source: https://github.com/pivotal-cf/bosh-creds-resource
+- name: bosh-creds
+  type: docker-image
+  source:
+    repository: mkuratczyk/bosh-creds-resource
+    tag: 1.4
+
+resources:
+
+- name: bosh-creds
+  type: bosh-creds
+  source:
+    pcf_opsman_admin_username: ((opsman_admin_username))
+    pcf_opsman_admin_password: ((opsman_admin_password))
+    opsman_url: ((opsman_domain_or_ip_address))
+
+- name: bbr-pipeline-tasks-repo
+  type: git
+  source:
+    uri: ((bbr_pipelines_repo))
+    branch: ((bbr_pipelines_repo_branch))
+
+jobs:
+
+# keep the backup as a single unit to avoid copying the backup between container volumes
+# even resources store a copy so the work must be self contained
+- name: backup-pas-to-azure
+  plan:
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+    - get: bosh-creds
+  - task: backup-pas-to-azure
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-deployment-to-azure/task.yml
+
+# keep the backup as a single unit to avoid copying the backup between container volumes
+# even resources store a copy so the work must be self contained
+- name: backup-director-to-azure
+  plan:
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+    - get: bosh-creds    
+  - task: backup-director-to-azure
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director-to-azure/task.yml

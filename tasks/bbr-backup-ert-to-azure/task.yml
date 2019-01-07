@@ -1,0 +1,46 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: microsoft/azure-cli
+
+inputs:
+  - name: bbr-pipeline-tasks-repo
+    # Directory containing the bbr executable
+  - name: binary
+  
+run:
+  path: bbr-pipeline-tasks-repo/tasks/bbr-backup-deployment-to-azure/task.sh
+
+params:
+  # The Ops Manager URL, e.g. https://pcf.example.com
+  OPSMAN_URL:
+
+  # If true, SSL validation will be skipped when connecting to Ops Manager API
+  SKIP_SSL_VALIDATION: false
+
+  # Client credentials for Ops Manager API. If empty, user credentials will be used
+  CLIENT_ID:
+  CLIENT_SECRET:
+
+  # User credentials for Ops Manager API
+  OPSMAN_USERNAME:
+  OPSMAN_PASSWORD:
+
+  # The SSH private key for the Ops Manager VM
+  # If provided, a SSH tunnel through the Ops Manager VM is created and used by bbr
+  OPSMAN_PRIVATE_KEY:
+
+  # The name of your storage account.
+  AZURE_STORAGE_ACCOUNT_NAME:
+
+  # The primary or secondary access key for your storage account.
+  AZURE_STORAGE_ACCOUNT_KEY:
+
+  # A name of the container to upload to
+  AZURE_STORAGE_CONTAINER:
+
+  # the path to small file on your local computer
+  AZURE_STORAGE_VERSIONED_FILE:
