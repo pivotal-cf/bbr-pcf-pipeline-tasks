@@ -39,17 +39,17 @@ resources:
     owner: pivotal-cf
     repository: om
 
-- name: bosh
-  type: github-release
-  source: 
-    owner: cloudfoundry
-    repository: bosh
+# - name: bosh
+#   type: github-release
+#   source: 
+#     owner: cloudfoundry
+#     repository: bosh
 
-- name: fly
-  type: github-release
-  source: 
-    owner: concourse
-    repository: fly
+#- name: fly
+#  type: github-release
+#  source: 
+#    owner: concourse
+#    repository: fly
 
 - name: bbr-release
   type: pivnet
@@ -73,6 +73,7 @@ jobs:
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-ert-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert-to-azure/task.yml
     params:
@@ -94,6 +95,7 @@ jobs:
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-director-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director-to-azure/task.yml
     params:
