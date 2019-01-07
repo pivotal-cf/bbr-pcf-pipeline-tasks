@@ -16,7 +16,7 @@ function catch()
 
 cp om/om-linux /usr/local/bin/om
 chmod +x /usr/local/bin/om
-
+source bosh_creds/bosh2_commandline_credentials
 source pcf-pipelines-repo/scripts/export-director-metadata
 
 pushd director-backup-artifact    
