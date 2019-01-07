@@ -73,7 +73,7 @@ jobs:
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
-  - task: backup-ert-to-azure
+  - task: bbr-backup-ert-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert-to-azure/task.yml
     params:
       <<: *opsman_credentials
