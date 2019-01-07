@@ -1,3 +1,16 @@
+---
+opsman_credentials: &opsman_credentials
+  SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+  OPSMAN_URL: ((opsman-url))
+  OPSMAN_USERNAME: ((opsman-username))
+  OPSMAN_PASSWORD: ((opsman-password))
+  OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+
+azure_storage: &azure_storage  
+  AZURE_STORAGE_ACCOUNT_NAME: ((azure-storage-account-name))
+  AZURE_STORAGE_ACCOUNT_KEY: ((azure-storage-account-key))
+  AZURE_STORAGE_CONTAINER: ((azure-storage-container))  
+
 resource_types:
 # source: https://github.com/pivotal-cf/bosh-creds-resource
 - name: bosh-creds
@@ -57,19 +70,15 @@ jobs:
       params:
         globs: 
         - om-linux
-    - get: fly
-      params:
-        globs:
-        - fly_linux_amd64
-    - get: bosh
-      params:
-        globs:
-        - *-linux-amd64
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
   - task: backup-pas-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-deployment-to-azure/task.yml
+    params:
+      <<: *opsman_credentials
+      <<: *azure_storage
+      AZURE_STORAGE_VERSIONED_FILE: pas-backup.tgz
 
 # keep the backup as a single unit to avoid copying the backup between container volumes
 # even resources store a copy so the work must be self contained
@@ -82,16 +91,29 @@ jobs:
       params:
         globs: 
         - om-linux
-    - get: fly
-      params:
-        globs:
-        - fly_linux_amd64
-    - get: bosh
-      params:
-        globs:
-        - *-linux-amd64
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
   - task: backup-director-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director-to-azure/task.yml
+    params:
+      <<: *opsman_credentials
+      <<: *azure_storage
+      AZURE_STORAGE_VERSIONED_FILE: director-backup.tgz
+
+# keep the backup as a single unit to avoid copying the backup between container volumes
+# even resources store a copy so the work must be self contained
+- name: export-om-installation-to-azure
+  plan: 
+  - aggregate:
+    - get: bbr-pipeline-tasks-repo
+    - get: om
+      params:
+        globs:
+        - om-linux
+  - task: export-om-installation-to-azure
+    file: bbr-pipeline-tasks-repo/tasks/export-om-installation-to-azure/tas.yml
+    params:
+      <<: *opsman_credentials
+      <<: *azure_storage
+      AZURE_STORAGE_VERSIONED_FILE: om-installation.zip

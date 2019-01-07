@@ -1,0 +1,16 @@
+pivnet-api-token: example-pivnet-token
+concourse-worker-tag: some-worker-tag
+
+# Ops Manager credentials
+skip-ssl-validation: false
+opsman-url: https://pcf.example.com
+opsman-username: example-user
+opsman-password: example-password
+opsman-private-key:  | # optional, Ops Manager VM SSH private key
+  -----BEGIN EXAMPLE PRIVATE KEY-----
+  ...
+  -----END EXAMPLE PRIVATE KEY-----
+
+azure-storage-account-name: someuniquename
+azure-storage-account-key: thisShouldBeAReallyLongStringMaybeItHasAnEqualAtTheEnd==
+azure-storage-container: thenameofthecontainer
