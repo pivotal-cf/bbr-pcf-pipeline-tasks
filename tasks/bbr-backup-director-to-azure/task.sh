@@ -14,6 +14,9 @@ function catch()
     return $ex_code
 }
 
+cp om/om-linux /usr/local/bin/om
+chmod +x /usr/local/bin/om
+
 source pcf-pipelines-repo/scripts/export-director-metadata
 
 pushd director-backup-artifact    

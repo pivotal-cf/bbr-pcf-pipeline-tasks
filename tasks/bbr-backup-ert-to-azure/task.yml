@@ -10,9 +10,12 @@ inputs:
   - name: bbr-pipeline-tasks-repo
     # Directory containing the bbr executable
   - name: binary
+  - name: om
+  - name: bosh
+  - name: fly
   
 run:
-  path: bbr-pipeline-tasks-repo/tasks/bbr-backup-deployment-to-azure/task.sh
+  path: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert-to-azure/task.sh
 
 params:
   # The Ops Manager URL, e.g. https://pcf.example.com

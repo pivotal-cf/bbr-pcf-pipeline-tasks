@@ -6,6 +6,12 @@ resource_types:
     repository: mkuratczyk/bosh-creds-resource
     tag: 1.4
 
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+
 resources:
 
 - name: bosh-creds
@@ -21,6 +27,30 @@ resources:
     uri: ((bbr_pipelines_repo))
     branch: ((bbr_pipelines_repo_branch))
 
+- name: om
+  type: github-release
+  source: 
+    owner: pivotal-cf
+    repository: om
+
+- name: bosh
+  type: github-release
+  source: 
+    owner: cloudfoundry
+    repository: bosh
+
+- name: fly
+  type: github-release
+  source: 
+    owner: concourse
+    repository: fly
+
+- name: bbr-release
+  type: pivnet
+  source:
+    api_token: ((pivnet-api-token))
+    product_slug: p-bosh-backup-and-restore
+
 jobs:
 
 # keep the backup as a single unit to avoid copying the backup between container volumes
@@ -28,8 +58,24 @@ jobs:
 - name: backup-pas-to-azure
   plan:
   - aggregate:
+    - get: bbr-release
     - get: bbr-pipeline-tasks-repo
     - get: bosh-creds
+    - get: om
+      params:
+        globs: 
+        - om-linux
+    - get: fly
+      params:
+        globs:
+        - fly_linux_amd64
+    - get: bosh
+      params:
+        globs:
+        - *-linux-amd64
+  - task: extract-binary
+    tags:
+    - ((concourse-worker-tag))
   - task: backup-pas-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-deployment-to-azure/task.yml
 
@@ -38,7 +84,23 @@ jobs:
 - name: backup-director-to-azure
   plan:
   - aggregate:
+    - get: bbr-release
     - get: bbr-pipeline-tasks-repo
-    - get: bosh-creds    
+    - get: bosh-creds
+    - get: om
+      params:
+        globs: 
+        - om-linux
+    - get: fly
+      params:
+        globs:
+        - fly_linux_amd64
+    - get: bosh
+      params:
+        globs:
+        - *-linux-amd64
+  - task: extract-binary
+    tags:
+    - ((concourse-worker-tag))
   - task: backup-director-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director-to-azure/task.yml
