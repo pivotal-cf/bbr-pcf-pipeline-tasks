@@ -61,7 +61,7 @@ jobs:
 
 # keep the backup as a single unit to avoid copying the backup between container volumes
 # even resources store a copy so the work must be self contained
-- name: backup-pas-to-azure
+- name: backup-ert-to-azure
   plan:
   - aggregate:
     - get: bbr-release
@@ -73,8 +73,8 @@ jobs:
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
-  - task: backup-pas-to-azure
-    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-deployment-to-azure/task.yml
+  - task: backup-ert-to-azure
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert-to-azure/task.yml
     params:
       <<: *opsman_credentials
       <<: *azure_storage
