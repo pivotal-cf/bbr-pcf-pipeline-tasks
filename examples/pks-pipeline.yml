@@ -13,6 +13,44 @@ s3_credentials: &s3_credentials
   secret_access_key: ((storage-secret-access-key))
   endpoint: ((storage-endpoint))
 
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+
+resources:
+- name: bbr-pipeline-tasks-repo
+  type: git
+  source:
+    uri:  https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+    branch: master
+
+- name: bbr-release
+  type: pivnet
+  source:
+    api_token: ((pivnet-api-token))
+    product_slug: p-bosh-backup-and-restore
+
+- name: om-backup-bucket
+  type: s3
+  source:
+    <<: *s3_credentials
+    versioned_file: installation.zip
+
+- name: director-backup-bucket
+  type: s3
+  source:
+    <<: *s3_credentials
+    versioned_file: director-backup.tar
+
+- name: pks-backup-bucket
+  type: s3
+  source:
+    <<: *s3_credentials
+    versioned_file: pks-backup.tar
+
 jobs:
 - name: export-om-installation
   serial: true
@@ -145,41 +183,3 @@ jobs:
     file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
     params:
       <<: *opsman_credentials
-
-resource_types:
-- name: pivnet
-  type: docker-image
-  source:
-    repository: pivotalcf/pivnet-resource
-    tag: latest-final
-
-resources:
-- name: bbr-pipeline-tasks-repo
-  type: git
-  source:
-    uri:  https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
-    branch: master
-
-- name: bbr-release
-  type: pivnet
-  source:
-    api_token: ((pivnet-api-token))
-    product_slug: p-bosh-backup-and-restore
-
-- name: om-backup-bucket
-  type: s3
-  source:
-    <<: *s3_credentials
-    versioned_file: installation.zip
-
-- name: director-backup-bucket
-  type: s3
-  source:
-    <<: *s3_credentials
-    versioned_file: director-backup.tar
-
-- name: pks-backup-bucket
-  type: s3
-  source:
-    <<: *s3_credentials
-    versioned_file: pks-backup.tar
