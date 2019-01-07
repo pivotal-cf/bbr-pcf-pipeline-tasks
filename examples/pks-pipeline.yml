@@ -70,7 +70,7 @@ jobs:
     params:
       file: om-installation/installation.zip
 
-- name: lock-pks
+- name: bbr-backup-pks-foundation
   serial: true
   plan:
   - aggregate:
@@ -80,107 +80,48 @@ jobs:
     file: bbr-pipeline-tasks-repo/tasks/lock-pks/task.yml
     params:
       <<: *opsman_credentials
-
-- name: bbr-backup-director
-  serial: true
-  plan:
-  - aggregate:
-    - get: bbr-release
-      passed: [lock-pks]
-    - get: bbr-pipeline-tasks-repo
-      passed: [lock-pks]
   - task: extract-binary
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-  - task: bbr-backup-director
-    privileged: true
-    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
-    params:
-      <<: *opsman_credentials
-    on_failure:
-      aggregate:
-      - task: bbr-cleanup-director
+  - aggregate:
+    - task: bbr-backup-director
+      file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
+      params:
+        <<: *opsman_credentials
+      on_failure:
+        task: bbr-cleanup-director
         file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.yml
         params:
           <<: *opsman_credentials
-      - task: unlock-pks
-        file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
-        params:
-          <<: *opsman_credentials
-  - put: director-backup-bucket
-    params:
-      file: director-backup-artifact/director-backup.tar
-
-- name: bbr-backup-pks
-  serial: true
-  plan:
-  - aggregate:
-    - get: bbr-release
-      passed: [lock-pks]
-    - get: bbr-pipeline-tasks-repo
-      passed: [lock-pks]
-  - task: extract-binary
-    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-  - task: bbr-backup-pks
-    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pks/task.yml
-    params:
-      <<: *opsman_credentials
-    on_failure:
-      aggregate:
-      - task: bbr-cleanup-pks
+    - task: bbr-backup-pks
+      file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pks/task.yml
+      params:
+        <<: *opsman_credentials
+      on_failure:
+        task: bbr-cleanup-pks
         file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pks/task.yml
         params:
           <<: *opsman_credentials
-      - task: unlock-pks
-        file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
-        params:
-          <<: *opsman_credentials
-  - put: pks-backup-bucket
-    params:
-      file: pks-backup-artifact/pks-backup.tar
-
-- name: bbr-backup-pks-clusters
-  serial: true
-  plan:
-  - aggregate:
-    - get: bbr-release
-      passed: [lock-pks]
-    - get: bbr-pipeline-tasks-repo
-      passed: [lock-pks]
-  - task: extract-binary
-    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-  - task: bbr-backup-pks-clusters
-    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pks-clusters/task.yml
-    params:
-      <<: *opsman_credentials
-    on_failure:
-      aggregate:
-      - task: unlock-pks
-        file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
-        params:
-          <<: *opsman_credentials
-      - task: bbr-cleanup-pks-clusters
+    - task: bbr-backup-pks-clusters
+      file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pks-clusters/task.yml
+      params:
+        <<: *opsman_credentials
+      on_failure:
+        task: bbr-cleanup-pks-clusters
         file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pks-clusters/task.yml
         params:
           <<: *opsman_credentials
-  - put: pks-backup-bucket
-    params:
-      file: pks-clusters-backup-artifact/pks-clusters-backup.tar
-
-- name: unlock-pks
-  serial: true
-  plan:
   - aggregate:
-    - get: bbr-release
-      passed:
-      - bbr-backup-director
-      - bbr-backup-pks
-      - bbr-backup-pks-clusters
-    - get: bbr-pipeline-tasks-repo
-      passed:
-      - bbr-backup-director
-      - bbr-backup-pks
-      - bbr-backup-pks-clusters
-  - task: unlock-pks
+    - put: director-backup-bucket
+      params:
+        file: director-backup-artifact/director-backup.tar
+    - put: pks-backup-bucket
+      params:
+        file: pks-backup-artifact/pks-backup.tar
+    - put: pks-backup-bucket
+      params:
+        file: pks-clusters-backup-artifact/pks-clusters-backup.tar
+  ensure:
+    task: unlock-pks
     file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
     params:
       <<: *opsman_credentials
