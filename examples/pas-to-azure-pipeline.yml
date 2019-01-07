@@ -78,7 +78,7 @@ jobs:
     params:
       <<: *opsman_credentials
       <<: *azure_storage
-      AZURE_STORAGE_CONTAINER: ((azure_storage_container_pas_backup))
+      AZURE_STORAGE_CONTAINER: ((azure-storage-container-pas-backup))
       AZURE_STORAGE_VERSIONED_FILE: pas-backup.tgz
 
 # keep the backup as a single unit to avoid copying the backup between container volumes
@@ -101,7 +101,7 @@ jobs:
     params:
       <<: *opsman_credentials
       <<: *azure_storage
-      AZURE_STORAGE_CONTAINER: ((azure_storage_container_director_backup))
+      AZURE_STORAGE_CONTAINER: ((azure-storage-container-director-backup))
       AZURE_STORAGE_VERSIONED_FILE: director-backup.tgz
 
 # keep the backup as a single unit to avoid copying the backup between container volumes
@@ -119,5 +119,5 @@ jobs:
     params:
       <<: *opsman_credentials
       <<: *azure_storage
-      AZURE_STORAGE_CONTAINER: ((azure_storage_container_om_backup))
+      AZURE_STORAGE_CONTAINER: ((azure-storage-container-om-backup))
       AZURE_STORAGE_VERSIONED_FILE: om-installation.zip
