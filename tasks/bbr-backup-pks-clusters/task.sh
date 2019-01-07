@@ -22,3 +22,5 @@ pushd pks-clusters-backup-artifact
 
   tar -cvf pks-clusters-backup.tar -- *
 popd
+
+echo "i backed up!"
