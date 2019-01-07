@@ -112,7 +112,7 @@ jobs:
         globs:
         - om-linux
   - task: export-om-installation-to-azure
-    file: bbr-pipeline-tasks-repo/tasks/export-om-installation-to-azure/tas.yml
+    file: bbr-pipeline-tasks-repo/tasks/export-om-installation-to-azure/task.yml
     params:
       <<: *opsman_credentials
       <<: *azure_storage
