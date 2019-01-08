@@ -47,7 +47,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 ROOT=$DIR/../../..
 
 # move om into the path
-cp om/om-linux /usr/local/bin/om
+cp $ROOT/om/om-linux /usr/local/bin/om
 chmod +x /usr/local/bin/om
 
 source $ROOT/bbr-pipeline-tasks-repo/scripts/export-director-metadata

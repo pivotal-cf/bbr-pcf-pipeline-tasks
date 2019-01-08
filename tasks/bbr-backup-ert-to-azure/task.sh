@@ -21,7 +21,8 @@ function try_backup_pas(){
 
 function cleanup_pas_backup(){
     echo "cleaning up backup"
-    $ROOT/binary/bbr deployment --target "$BOSH_ENVIRONMENT" \
+    $ROOT/binary/bbr deployment 
+        --target "$BOSH_ENVIRONMENT" \
         --username "$BOSH_CLIENT" \
         --deployment "$DEPLOYMENT_NAME" \
         --ca-cert "$BOSH_CA_CERT_PATH" \
@@ -49,7 +50,9 @@ chmod +x /usr/local/bin/om
 source $ROOT/bbr-pipeline-tasks-repo/scripts/export-director-metadata
 source $ROOT/bbr-pipeline-tasks-repo/scripts/export-cf-metadata
 
+set +e
 (
+    set -e
     mkdir -p $ROOT/ert-backup-artifact
     pushd $ROOT/ert-backup-artifact
 
