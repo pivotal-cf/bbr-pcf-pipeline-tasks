@@ -2,74 +2,79 @@
 
 set -e
 
-# https://stackoverflow.com/a/25180186
-function try()
-{
-    [[ $- = *e* ]]; SAVED_OPT_E=$?
-    set +e
-}
+# get script directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-function throw()
-{
-    exit $1
-}
-
-function catch()
-{
-    export ex_code=$?
-    (( $SAVED_OPT_E )) && set +e
-    return $ex_code
-}
-
-function throwErrors()
-{
-    set -e
-}
-
-function ignoreErrors()
-{
-    set +e
-}
-
+# move om into the path
 cp om/om-linux /usr/local/bin/om
 chmod +x /usr/local/bin/om
 
-source pcf-pipelines-repo/scripts/export-director-metadata
+source $DIR/bbr-pipeline-tasks-repo/scripts/export-director-metadata
 
-mkdir -p director-backup-artifact
-pushd director-backup-artifact    
-    
-    echo "backing up director"    
+set +e
+(
+    set -e
+    mkdir -p $DIR/director-backup-artifact
+    pushd $DIR/director-backup-artifact
 
-    try
+        # call backup director function
+        backup_director   
+
+        echo "compressing backup"
+        tar -cvzf director-backup.tgz -- *
+
+    popd
+
+    upload_to_azure
+)
+
+return_code=$?
+set -e
+
+# always cleanup
+echo "cleaning up backup"
+rm -rf $DIR/director-backup-artifact
+
+if [ $return_code -ne 0 ]; then
+  exit $return_code
+fi
+
+function backup_director(){
+    set +e
     (
-        throwErrors
-        ../binary/bbr director --host "${BOSH_ENVIRONMENT}" \
+        set -e
+        try_backup_director
+    )
+    return_code=$?
+    if [ $return_code -ne 0 ]; then
+        cleanup_director
+    fi
+    set -e
+    return $return_code
+}
+
+function try_backup_director(){
+    echo "backing up director"
+    $DIR/binary/bbr director --host "${BOSH_ENVIRONMENT}" \
         --username "$BOSH_USERNAME" \
         --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
-        backup
-    )
-    catch || {
-        echo "cleaning up backup"
-        ../binary/bbr director --host "${BOSH_ENVIRONMENT}" \
-            --username "$BOSH_USERNAME" \
-            --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
-            backup-cleanup
-    }
-    echo "compressing backup"
-    tar -cvzf director-backup.tgz -- *
+        backup            
+}
 
-popd
+function cleanup_backup(){
+    echo "cleaning up backup"
+    $DIR/binary/bbr director --host "${BOSH_ENVIRONMENT}" \
+        --username "$BOSH_USERNAME" \
+        --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
+        backup-cleanup 
+}
 
-throwErrors
+function upload_to_azure(){
+    echo "uploading backup to azure"
+    export FILE_TO_UPLOAD=$DIR/director-backup-artifact/director-backup.tgz
 
-echo "uploading backup to azure"
-export FILE_TO_UPLOAD=director-backup-artifact/director-backup.tgz
-
-az storage blob upload \
-    --file "$FILE_TO_UPLOAD" \
-    --container-name "$AZURE_STORAGE_CONTAINER" \
-    --name "$AZURE_STORAGE_VERSIONED_FILE"        
-
-echo "cleaning up backup"
-rm -rf director-backup-artifact
+    az storage blob upload \
+        --file "$FILE_TO_UPLOAD" \
+        --container-name "$AZURE_STORAGE_CONTAINER" \
+        --name "$AZURE_STORAGE_VERSIONED_FILE"        
+}
