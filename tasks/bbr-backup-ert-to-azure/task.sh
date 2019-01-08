@@ -61,7 +61,7 @@ popd
 
 echo "uploading backup to azure"
 export FILE_TO_UPLOAD=ert-backup-artifact/ert-backup.tgz
-
+set -e
 az storage blob upload \
     --file "$FILE_TO_UPLOAD" \
     --container-name "$AZURE_STORAGE_CONTAINER" \
