@@ -36,6 +36,7 @@ chmod +x /usr/local/bin/om
 
 source pcf-pipelines-repo/scripts/export-director-metadata
 
+mkdir -p director-backup-artifact
 pushd director-backup-artifact    
     
     echo "backing up director"    

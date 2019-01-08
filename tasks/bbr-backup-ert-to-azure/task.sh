@@ -37,6 +37,7 @@ chmod +x /usr/local/bin/om
 source bbr-pipeline-tasks-repo/scripts/export-director-metadata
 source bbr-pipeline-tasks-repo/scripts/export-cf-metadata
 
+mkdir -p ert-backup-artifact
 pushd ert-backup-artifact
     try
     (
