@@ -2,44 +2,6 @@
 
 set -e
 
-# get script directory
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-ROOT=$DIR/../../..
-
-# move om into the path
-cp om/om-linux /usr/local/bin/om
-chmod +x /usr/local/bin/om
-
-source $ROOT/bbr-pipeline-tasks-repo/scripts/export-director-metadata
-
-set +e
-(
-    set -e
-    mkdir -p $ROOT/director-backup-artifact
-    pushd $ROOT/director-backup-artifact
-
-        # call backup director function
-        backup_director   
-
-        echo "compressing backup"
-        tar -cvzf director-backup.tgz -- *
-
-    popd
-
-    upload_to_azure
-)
-
-return_code=$?
-set -e
-
-# always cleanup
-echo "cleaning up backup"
-rm -rf $ROOT/director-backup-artifact
-
-if [ $return_code -ne 0 ]; then
-  exit $return_code
-fi
-
 function backup_director(){
     set +e
     (
@@ -79,3 +41,41 @@ function upload_to_azure(){
         --container-name "$AZURE_STORAGE_CONTAINER" \
         --name "$AZURE_STORAGE_VERSIONED_FILE"        
 }
+
+# get script directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+ROOT=$DIR/../../..
+
+# move om into the path
+cp om/om-linux /usr/local/bin/om
+chmod +x /usr/local/bin/om
+
+source $ROOT/bbr-pipeline-tasks-repo/scripts/export-director-metadata
+
+set +e
+(
+    set -e
+    mkdir -p $ROOT/director-backup-artifact
+    pushd $ROOT/director-backup-artifact
+
+        # call backup director function
+        backup_director   
+
+        echo "compressing backup"
+        tar -cvzf director-backup.tgz -- *
+
+    popd
+
+    upload_to_azure
+)
+
+return_code=$?
+set -e
+
+# always cleanup
+echo "cleaning up backup"
+rm -rf $ROOT/director-backup-artifact
+
+if [ $return_code -ne 0 ]; then
+  exit $return_code
+fi
