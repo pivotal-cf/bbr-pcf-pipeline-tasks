@@ -11,8 +11,6 @@ inputs:
     # Directory containing the bbr executable
   - name: binary
   - name: om
-  - name: bosh
-  - name: fly
   
 run:
   path: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert-to-azure/task.sh
