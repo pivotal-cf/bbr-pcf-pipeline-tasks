@@ -1,10 +1,17 @@
 #!/bin/bash
 
+set -e 
+
 # https://stackoverflow.com/a/25180186
 function try()
 {
     [[ $- = *e* ]]; SAVED_OPT_E=$?
     set +e
+}
+
+function throw()
+{
+    exit $1
 }
 
 function catch()
@@ -14,17 +21,28 @@ function catch()
     return $ex_code
 }
 
+function throwErrors()
+{
+    set -e
+}
+
+function ignoreErrors()
+{
+    set +e
+}
+
 cp om/om-linux /usr/local/bin/om
 chmod +x /usr/local/bin/om
 
-source pcf-pipelines-repo/scripts/export-director-metadata
-source pcf-pipelines-repo/scripts/export-cf-metadata
+source bbr-pipeline-tasks-repo/scripts/export-director-metadata
+source bbr-pipeline-tasks-repo/scripts/export-cf-metadata
 
 pushd ert-backup-artifact
     try
     (
+        throwErrors
         echo "backing up deployment"
-        source pcf-pipelines-repo/scripts/deployment-backup
+        source bbr-pipeline-tasks-repo/scripts/deployment-backup
     )
     catch || {
         echo "cleaning up backup"
@@ -37,7 +55,7 @@ pushd ert-backup-artifact
         
     echo "compressing backup"
     tar -cvzf ert-backup.tgz -- *
-    
+
 popd
 
 echo "uploading backup to azure"

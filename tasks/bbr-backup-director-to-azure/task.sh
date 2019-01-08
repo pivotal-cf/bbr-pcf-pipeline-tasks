@@ -1,10 +1,17 @@
 #!/bin/bash
 
+set -e
+
 # https://stackoverflow.com/a/25180186
 function try()
 {
     [[ $- = *e* ]]; SAVED_OPT_E=$?
     set +e
+}
+
+function throw()
+{
+    exit $1
 }
 
 function catch()
@@ -14,21 +21,32 @@ function catch()
     return $ex_code
 }
 
+function throwErrors()
+{
+    set -e
+}
+
+function ignoreErrors()
+{
+    set +e
+}
+
 cp om/om-linux /usr/local/bin/om
 chmod +x /usr/local/bin/om
 
 source pcf-pipelines-repo/scripts/export-director-metadata
 
 pushd director-backup-artifact    
-    try(
-        echo "backing up director"    
+    
+    echo "backing up director"    
+
+    try
+    (
+        throwErrors
         ../binary/bbr director --host "${BOSH_ENVIRONMENT}" \
-            --username "$BOSH_USERNAME" \
-            --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
-            backup
-        
-        echo "compressing backup"
-        tar -cvzf director-backup.tgz -- *        
+        --username "$BOSH_USERNAME" \
+        --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
+        backup
     )
     catch || {
         echo "cleaning up backup"
@@ -37,6 +55,9 @@ pushd director-backup-artifact
             --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
             backup-cleanup
     }
+    echo "compressing backup"
+    tar -cvzf director-backup.tgz -- *
+
 popd
 
 echo "uploading backup to azure"
