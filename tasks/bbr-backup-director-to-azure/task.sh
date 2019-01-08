@@ -4,18 +4,19 @@ set -e
 
 # get script directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+ROOT=$DIR/../../..
 
 # move om into the path
 cp om/om-linux /usr/local/bin/om
 chmod +x /usr/local/bin/om
 
-source $DIR/bbr-pipeline-tasks-repo/scripts/export-director-metadata
+source $ROOT/bbr-pipeline-tasks-repo/scripts/export-director-metadata
 
 set +e
 (
     set -e
-    mkdir -p $DIR/director-backup-artifact
-    pushd $DIR/director-backup-artifact
+    mkdir -p $ROOT/director-backup-artifact
+    pushd $ROOT/director-backup-artifact
 
         # call backup director function
         backup_director   
@@ -33,7 +34,7 @@ set -e
 
 # always cleanup
 echo "cleaning up backup"
-rm -rf $DIR/director-backup-artifact
+rm -rf $ROOT/director-backup-artifact
 
 if [ $return_code -ne 0 ]; then
   exit $return_code
@@ -55,7 +56,7 @@ function backup_director(){
 
 function try_backup_director(){
     echo "backing up director"
-    $DIR/binary/bbr director --host "${BOSH_ENVIRONMENT}" \
+    $ROOT/binary/bbr director --host "${BOSH_ENVIRONMENT}" \
         --username "$BOSH_USERNAME" \
         --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
         backup            
@@ -63,7 +64,7 @@ function try_backup_director(){
 
 function cleanup_backup(){
     echo "cleaning up backup"
-    $DIR/binary/bbr director --host "${BOSH_ENVIRONMENT}" \
+    $ROOT/binary/bbr director --host "${BOSH_ENVIRONMENT}" \
         --username "$BOSH_USERNAME" \
         --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
         backup-cleanup 
@@ -71,7 +72,7 @@ function cleanup_backup(){
 
 function upload_to_azure(){
     echo "uploading backup to azure"
-    export FILE_TO_UPLOAD=$DIR/director-backup-artifact/director-backup.tgz
+    export FILE_TO_UPLOAD=$ROOT/director-backup-artifact/director-backup.tgz
 
     az storage blob upload \
         --file "$FILE_TO_UPLOAD" \
