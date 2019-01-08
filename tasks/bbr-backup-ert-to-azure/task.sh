@@ -21,12 +21,10 @@ source pcf-pipelines-repo/scripts/export-director-metadata
 source pcf-pipelines-repo/scripts/export-cf-metadata
 
 pushd ert-backup-artifact
-    try(
+    try
+    (
         echo "backing up deployment"
         source pcf-pipelines-repo/scripts/deployment-backup
-        
-        echo "compressing backup"
-        tar -cvzf ert-backup.tgz -- *
     )
     catch || {
         echo "cleaning up backup"
@@ -35,7 +33,11 @@ pushd ert-backup-artifact
             --deployment "$DEPLOYMENT_NAME" \
             --ca-cert "$BOSH_CA_CERT_PATH" \
             backup-cleanup
-    }
+    }    
+        
+    echo "compressing backup"
+    tar -cvzf ert-backup.tgz -- *
+    
 popd
 
 echo "uploading backup to azure"
