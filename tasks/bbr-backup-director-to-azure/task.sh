@@ -61,6 +61,8 @@ pushd director-backup-artifact
 
 popd
 
+throwErrors
+
 echo "uploading backup to azure"
 export FILE_TO_UPLOAD=director-backup-artifact/director-backup.tgz
 

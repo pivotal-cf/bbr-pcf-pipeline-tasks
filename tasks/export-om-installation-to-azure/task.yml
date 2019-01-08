@@ -33,10 +33,10 @@ params:
   OPSMAN_PASSWORD:
 
   # The name of your storage account.
-  AZURE_STORAGE_ACCOUNT_NAME:
+  AZURE_STORAGE_ACCOUNT:
 
   # The primary or secondary access key for your storage account.
-  AZURE_STORAGE_ACCOUNT_KEY:
+  AZURE_STORAGE_KEY:
 
   # A name of the container to upload to
   AZURE_STORAGE_CONTAINER:

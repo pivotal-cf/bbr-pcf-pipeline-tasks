@@ -7,8 +7,8 @@ opsman_credentials: &opsman_credentials
   OPSMAN_PRIVATE_KEY: ((opsman-private-key))
 
 azure_storage: &azure_storage  
-  AZURE_STORAGE_ACCOUNT_NAME: ((azure-storage-account-name))
-  AZURE_STORAGE_ACCOUNT_KEY: ((azure-storage-account-key))
+  AZURE_STORAGE_ACCOUNT: ((azure-storage-account-name))
+  AZURE_STORAGE_KEY: ((azure-storage-account-key))
 
 resource_types:
 # source: https://github.com/pivotal-cf/bosh-creds-resource
