@@ -72,7 +72,7 @@ set -e
 
 # always cleanup
 echo "cleaning up backup"
-rm -rf $ROOT/ert-backup-artifact
+rm -rf $ROOT/ert-backup-artifact/*
 
 if [ $return_code -ne 0 ]; then
   exit $return_code
