@@ -3,7 +3,7 @@
 set -e 
 
 function backup_pas(){
-    set +x
+    set +e
     (
         try_backup_pas
     )
@@ -11,7 +11,7 @@ function backup_pas(){
     if [ $return_code -ne 0 ]; then
         cleanup_pas_backup
     fi
-    set -x
+    set -e
 }
 
 function try_backup_pas(){
