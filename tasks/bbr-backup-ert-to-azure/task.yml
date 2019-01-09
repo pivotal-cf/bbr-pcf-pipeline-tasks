@@ -45,3 +45,6 @@ params:
 
   # the path to small file on your local computer
   AZURE_STORAGE_VERSIONED_FILE:
+  
+  # add the director to the no_proxy
+  ADD_DIRECTOR_TO_NO_PROXY: false
