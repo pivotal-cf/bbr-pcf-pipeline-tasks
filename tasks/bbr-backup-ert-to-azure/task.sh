@@ -68,8 +68,9 @@ set +e
         # call backup_pas function
         backup_pas 
 
-        echo "compressing backup"
-        tar cvzf ert-backup.tgz -- * | xargs rm -f
+        echo "compressing backup"        
+        find . -name \*.\* > filelist
+        tar czvf ert-backup.tgz -T filestoarchive | xargs rm -rf        
     popd
 
     upload_to_azure
