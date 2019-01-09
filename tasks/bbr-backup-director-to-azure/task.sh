@@ -71,8 +71,7 @@ set +e
         backup_director   
 
         echo "compressing backup"
-        find . -name \*.\* > filelist
-        tar czvf director-backup.tgz -T filelist | xargs rm -rf
+        tar -cvzf director-backup.tgz -- *
 
     popd
 
