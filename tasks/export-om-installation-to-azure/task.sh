@@ -4,7 +4,7 @@ set -eu
 
 # get script and task root directories
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-ROOT="$( relpath $DIR/../../.. )"
+ROOT="$( realpath $DIR/../../.. )"
 
 # move om into the path
 cp $ROOT/om/om-linux /usr/local/bin/om
