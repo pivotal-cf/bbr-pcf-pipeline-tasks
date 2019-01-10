@@ -4,7 +4,7 @@ set -eu
 
 # get script and task root directories
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-ROOT=$DIR/../../..
+ROOT="$( relpath $DIR/../../.. )"
 
 # move om into the path
 cp $ROOT/om/om-linux /usr/local/bin/om
@@ -14,7 +14,7 @@ chmod +x /usr/local/bin/om
 source bbr-pipeline-tasks-repo/scripts/om-cmd
 
 export BACKUP_FILE_DIRECTORY=$ROOT/om-installation
-export BACKUP_FILE_PATH=$BACKUP_FILE_DIRECTORY/om-installation/installation.zip
+export BACKUP_FILE_PATH=$BACKUP_FILE_DIRECTORY/installation.zip
 
 mkdir -p $BACKUP_FILE_DIRECTORY
 echo "exporting director installation"
