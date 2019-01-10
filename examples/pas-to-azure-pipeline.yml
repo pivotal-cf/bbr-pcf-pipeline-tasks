@@ -37,6 +37,7 @@ resources:
   source: 
     owner: pivotal-cf
     repository: om
+    access_token: ((github_token))
 
 # - name: bosh
 #   type: github-release

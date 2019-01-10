@@ -1,4 +1,5 @@
 pivnet-api-token: example-pivnet-token
+github_token: example-github-token
 concourse-worker-tag: some-worker-tag
 
 # Ops Manager credentials
