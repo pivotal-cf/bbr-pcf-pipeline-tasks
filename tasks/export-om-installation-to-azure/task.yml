@@ -8,6 +8,7 @@ image_resource:
 
 inputs:
   - name: bbr-pipeline-tasks-repo
+  - name: om
 
 outputs:
     # Contains exported Ops Manager installation settings in `installation.zip`
