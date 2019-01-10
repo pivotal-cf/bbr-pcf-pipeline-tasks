@@ -14,7 +14,7 @@ outputs:
   - name: om-installation
 
 run:
-  path: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.sh
+  path: bbr-pipeline-tasks-repo/tasks/export-om-installation-to-azure/task.sh
 
 params:
   # The Ops Manager URL, e.g. https://pcf.example.com
