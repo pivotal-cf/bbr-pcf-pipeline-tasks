@@ -75,6 +75,8 @@ jobs:
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-ert-to-azure
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert-to-azure/task.yml
+    tags:
+    - ((concourse-worker-tag))
     params:
       <<: *opsman_credentials
       <<: *azure_storage
@@ -97,6 +99,8 @@ jobs:
     - ((concourse-worker-tag))
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-director-to-azure
+    tags:
+    - ((concourse-worker-tag))
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director-to-azure/task.yml
     params:
       <<: *opsman_credentials
@@ -116,6 +120,8 @@ jobs:
         - om-linux
   - task: export-om-installation-to-azure
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation-to-azure/task.yml
+    tags:
+    - ((concourse-worker-tag))
     params:
       <<: *opsman_credentials
       <<: *azure_storage
