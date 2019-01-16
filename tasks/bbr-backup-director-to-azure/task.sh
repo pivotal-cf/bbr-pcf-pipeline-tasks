@@ -13,7 +13,7 @@ function backup_director(){
         cleanup_director
     fi
     set -e
-    return $return_code
+    exit $return_code
 }
 
 function try_backup_director(){

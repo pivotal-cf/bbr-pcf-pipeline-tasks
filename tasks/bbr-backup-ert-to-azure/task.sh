@@ -12,6 +12,7 @@ function backup_pas(){
         cleanup_pas_backup
     fi
     set -e
+    exit $return_code
 }
 
 function try_backup_pas(){
@@ -21,7 +22,7 @@ function try_backup_pas(){
 
 function cleanup_pas_backup(){
     echo "cleaning up backup"
-    $ROOT/binary/bbr deployment 
+    $ROOT/binary/bbr deployment \
         --target "$BOSH_ENVIRONMENT" \
         --username "$BOSH_CLIENT" \
         --deployment "$DEPLOYMENT_NAME" \
