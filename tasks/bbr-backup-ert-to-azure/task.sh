@@ -9,10 +9,10 @@ function backup_pas(){
     )
     return_code=$?
     if [ $return_code -ne 0 ]; then
-        cleanup_pas_backup
+        cleanup_pas_backup        
+        exit $return_code
     fi
     set -e
-    exit $return_code
 }
 
 function try_backup_pas(){

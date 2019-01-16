@@ -11,9 +11,9 @@ function backup_director(){
     return_code=$?
     if [ $return_code -ne 0 ]; then
         cleanup_director
+        exit $return_code
     fi
     set -e
-    exit $return_code
 }
 
 function try_backup_director(){
