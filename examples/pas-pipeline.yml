@@ -30,7 +30,7 @@ jobs:
     params:
       file: om-installation/installation.zip
 
-- name: bbr-backup-ert
+- name: bbr-backup-pas
   serial: true
   plan:
   - aggregate:
@@ -40,20 +40,20 @@ jobs:
     tags:
     - ((concourse-worker-tag))
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-  - task: bbr-backup-ert
+  - task: bbr-backup-pas
     tags:
     - ((concourse-worker-tag))
-    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-ert/task.yml
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pas/task.yml
     params:
       <<: *opsman_credentials
     on_failure:
-      task: bbr-cleanup-ert
-      file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-ert/task.yml
+      task: bbr-cleanup-pas
+      file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pas/task.yml
       params:
         <<: *opsman_credentials
-  - put: ert-backup-bucket
+  - put: pas-backup-bucket
     params:
-      file: ert-backup-artifact/ert-backup.tar
+      file: pas-backup-artifact/pas-backup.tar
 
 - name: bbr-backup-director
   serial: true
@@ -100,11 +100,11 @@ resources:
   source:
     <<: *s3_credentials
     versioned_file: installation.zip
-- name: ert-backup-bucket
+- name: pas-backup-bucket
   type: s3
   source:
     <<: *s3_credentials
-    versioned_file: ert-backup.tar
+    versioned_file: pas-backup.tar
 - name: director-backup-bucket
   type: s3
   source:
