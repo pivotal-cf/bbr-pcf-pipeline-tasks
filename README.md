@@ -7,9 +7,13 @@ This is a collection of [Concourse](https://concourse.ci) tasks for backing up a
 - [bbr-backup-director](tasks/bbr-backup-director/task.yml): Run `bbr director backup`
 - [bbr-cleanup-director](tasks/bbr-cleanup-director/task.yml): Run `bbr director backup-cleanup`
 
-### PAS/ERT
-- [bbr-backup-ert](tasks/bbr-backup-ert/task.yml): Run `bbr deployment backup` for PAS/ERT
-- [bbr-cleanup-ert](tasks/bbr-cleanup-ert/task.yml): Run `bbr deployment backup-cleanup` for PAS/ERT
+### DEPRECATED - ERT
+- [bbr-backup-ert](tasks/bbr-backup-ert/task.yml): Run `bbr deployment backup` for ERT
+- [bbr-cleanup-ert](tasks/bbr-cleanup-ert/task.yml): Run `bbr deployment backup-cleanup` for ERT
+
+### PAS
+- [bbr-backup-pas](tasks/bbr-backup-pas/task.yml): Run `bbr deployment backup` for PAS
+- [bbr-cleanup-pas](tasks/bbr-cleanup-pas/task.yml): Run `bbr deployment backup-cleanup` for PAS
 
 ### PKS
 - [bbr-backup-pks](tasks/bbr-backup-pks/task.yml): Run `bbr deployment backup` for PKS control plane
@@ -49,3 +53,10 @@ Running regular backups (at least every 24 hours) and storing multiple copies of
 ### Backup artifact storage
 
 There are a variety of storage resources such as [S3](https://github.com/concourse/s3-resource) that can be used to move backups to storage. A list of Concourse resources can be found [here](https://concourse.ci/resource-types.html).
+
+---
+
+## Semantic Versioning
+
+The inputs, outputs, params, filename, and filepath of all task files in this repo are part of a semantically versioned API.
+See our documentation for a detailed discussion of our semver API. See www.semver.org for an explanation of semantic versioning.
