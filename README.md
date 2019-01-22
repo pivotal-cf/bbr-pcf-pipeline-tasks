@@ -60,3 +60,17 @@ There are a variety of storage resources such as [S3](https://github.com/concour
 
 The inputs, outputs, params, filename, and filepath of all task files in this repo are part of a semantically versioned API.
 See our documentation for a detailed discussion of our semver API. See www.semver.org for an explanation of semantic versioning.
+
+### Pinning to a version
+
+This repository has git tags that can be used to pin to a specific version. For example, here is how to pin to v1.0.0 using `tag_filter`:
+
+```yaml
+resources:
+- name: bbr-pipeline-tasks-repo
+  type: git
+  source:
+    uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+    branch: master
+    tag_filter: v1.0.0
+```
