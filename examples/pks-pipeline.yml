@@ -52,6 +52,12 @@ resources:
     <<: *s3_credentials
     versioned_file: pks-backup.tar
 
+- name: pks-clusters-backup-bucket
+  type: s3
+  source:
+    <<: *s3_credentials
+    versioned_file: pks-clusters-backup.tar
+
 jobs:
 - name: export-om-installation
   serial: true
@@ -117,7 +123,7 @@ jobs:
     - put: pks-backup-bucket
       params:
         file: pks-backup-artifact/pks-backup.tar
-    - put: pks-backup-bucket
+    - put: pks-clusters-backup-bucket
       params:
         file: pks-clusters-backup-artifact/pks-clusters-backup.tar
   ensure:
