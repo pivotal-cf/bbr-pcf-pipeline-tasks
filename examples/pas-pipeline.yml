@@ -36,6 +36,12 @@ jobs:
   - aggregate:
     - get: bbr-pipeline-tasks-repo
     - get: bbr-release
+  - task: check-opsman-status
+    tags:
+    - ((concourse-worker-tag))
+    file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
+    params:
+      <<: *opsman_credentials
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
@@ -61,6 +67,12 @@ jobs:
   - aggregate:
     - get: bbr-pipeline-tasks-repo
     - get: bbr-release
+  - task: check-opsman-status
+    tags:
+    - ((concourse-worker-tag))
+    file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
+    params:
+      <<: *opsman_credentials
   - task: extract-binary
     tags:
     - ((concourse-worker-tag))
