@@ -11,7 +11,7 @@ status="$(om_cmd installations --format json | jq .[0].status)"
 trimmed_status="$(xargs <<< "$status")"
 
 if [ "$trimmed_status" == "running" ]; then
-  echo "\"Apply Changes\" is in flight." | tee /dev/stder
+  echo "\"Apply Changes\" is in flight." | tee /dev/stderr
   exit 1
 fi
 
