@@ -6,6 +6,9 @@ This is a collection of [Concourse](https://concourse.ci) tasks for backing up a
 - [export-om-installation](tasks/export-om-installation/task.yml): Export Ops Manager installation settings
 - [bbr-backup-director](tasks/bbr-backup-director/task.yml): Run `bbr director backup`
 - [bbr-cleanup-director](tasks/bbr-cleanup-director/task.yml): Run `bbr director backup-cleanup`
+- [check-opsman-status](tasks/check-opsman-status/task.yml): Check `Apply changes` is not inflight before taking a backup. If it is, the task fails. This should prevent a backup from taking place. Please refer to the [example](examples/) pipelines to see how the task is used.
+
+
 
 ### DEPRECATED - ERT
 - [bbr-backup-ert](tasks/bbr-backup-ert/task.yml): Run `bbr deployment backup` for ERT
