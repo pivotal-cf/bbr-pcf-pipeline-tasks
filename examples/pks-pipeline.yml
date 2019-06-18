@@ -83,8 +83,6 @@ jobs:
     - get: bbr-release
     - get: bbr-pipeline-tasks-repo
   - task: check-opsman-status
-    tags:
-    - ((concourse-worker-tag))
     file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
     params:
       <<: *opsman_credentials
