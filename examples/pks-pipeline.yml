@@ -86,6 +86,12 @@ jobs:
     file: bbr-pipeline-tasks-repo/tasks/lock-pks/task.yml
     params:
       <<: *opsman_credentials
+  - task: check-opsman-status
+    tags:
+    - ((concourse-worker-tag))
+    file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
+    params:
+      <<: *opsman_credentials
   - task: extract-binary
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - aggregate:
