@@ -37,3 +37,9 @@ params:
   # The SSH private key for the Ops Manager VM
   # If provided, a SSH tunnel through the Ops Manager VM is created and used by bbr
   OPSMAN_PRIVATE_KEY:
+
+  # Config NO_PROXY for BOSH cli and OM
+  # Setting SET_NO_PROXY: true results in NO_PROXY being exported 
+  #   with the BOSH Director IP and OPSMAN host
+  SET_NO_PROXY:
+  
