@@ -51,9 +51,9 @@ if [ ! -z ${OPSMAN_PRIVATE_KEY:+x} ]; then
   sleep 10s
 fi
 
-# Set NO_PROXY for BOSH Director and opsman host
+# Set NO_PROXY for BOSH Director
 if [ ! -z ${SET_NO_PROXY:+x} ] && [ $SET_NO_PROXY = true ]; then
-    export NO_PROXY="${BOSH_ENVIRONMENT},$(basename "${OPSMAN_URL}")"
+    export NO_PROXY="$NO_PROXY,${BOSH_ENVIRONMENT}")"
     echo "exporting NO_PROXY=${NO_PROXY}"
 fi
 
