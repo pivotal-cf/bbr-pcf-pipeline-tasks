@@ -36,6 +36,6 @@ params:
 
   # Config NO_PROXY for BOSH cli and OM
   # Setting SET_NO_PROXY: true results in NO_PROXY being exported 
-  #   with the BOSH Director IP and OPSMAN host
+  # with the BOSH Director IP
   SET_NO_PROXY:
   
