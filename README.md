@@ -57,6 +57,24 @@ Running regular backups (at least every 24 hours) and storing multiple copies of
 
 There are a variety of storage resources such as [S3](https://github.com/concourse/s3-resource) that can be used to move backups to storage. A list of Concourse resources can be found [here](https://concourse.ci/resource-types.html).
 
+### HTTP Proxies
+
+BBR tasks for backing up deployments (pas, pks & ert) leverage the BOSH API and will result in HTTP requests to the director. 
+
+Setting the `SET_NO_PROXY` parameter on the tasks will result in a `NO_PROXY` environment variable being exported that contains the BOSH Director IP. 
+
+```yaml
+- task: bbr-backup-pas
+  file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pas/task.yml
+  params:
+    SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+    OPSMAN_URL: ((opsman-url))
+    OPSMAN_USERNAME: ((opsman-username))
+    OPSMAN_PASSWORD: ((opsman-password))
+    OPSMAN_PRIVATE_KEY: ((opsman-private-key))    
+    SET_NO_PROXY: true
+```
+
 ---
 
 ## Semantic Versioning
