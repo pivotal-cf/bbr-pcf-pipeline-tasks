@@ -62,7 +62,7 @@ jobs:
 - name: export-om-installation
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: bbr-release
     - get: bbr-pipeline-tasks-repo
   - task: export-om-installation
@@ -79,7 +79,7 @@ jobs:
 - name: bbr-backup-pks-foundation
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: bbr-release
     - get: bbr-pipeline-tasks-repo
   - task: check-opsman-status
@@ -92,7 +92,7 @@ jobs:
       <<: *opsman_credentials
   - task: extract-binary
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-  - aggregate:
+  - in_parallel:
     - task: bbr-backup-director
       file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
       params:
@@ -120,7 +120,7 @@ jobs:
         file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pks-clusters/task.yml
         params:
           <<: *opsman_credentials
-  - aggregate:
+  - in_parallel:
     - put: director-backup-bucket
       params:
         file: director-backup-artifact/director-backup.tar
