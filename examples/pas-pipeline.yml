@@ -17,7 +17,7 @@ jobs:
 - name: export-om-installation
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: bbr-pipeline-tasks-repo
   - task: export-om-installation
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
@@ -33,7 +33,7 @@ jobs:
 - name: bbr-backup-pas
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: bbr-pipeline-tasks-repo
     - get: bbr-release
   - task: check-opsman-status
@@ -64,7 +64,7 @@ jobs:
 - name: bbr-backup-director
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: bbr-pipeline-tasks-repo
     - get: bbr-release
   - task: check-opsman-status
