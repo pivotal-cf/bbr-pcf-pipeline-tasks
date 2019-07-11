@@ -12,6 +12,6 @@ source "$scripts/export-cf-metadata"
 pushd pas-backup-artifact
   # shellcheck disable=SC1090
   source "../$scripts/deployment-backup"
-  tar -cvf pas-backup.tar -- *
+  tar -cvf pas-backup.tar --remove-files -- */*
 popd
 
