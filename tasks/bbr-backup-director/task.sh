@@ -11,7 +11,6 @@ pushd director-backup-artifact
     --private-key-path <(echo "${BOSH_PRIVATE_KEY}") \
     backup
 
-  tar -cvf director-backup.tar -- *
+  tar -cvf director-backup.tar --remove-files -- */*
   # shellcheck disable=SC2086
-  rm -rf ${BOSH_ENVIRONMENT}_*
 popd

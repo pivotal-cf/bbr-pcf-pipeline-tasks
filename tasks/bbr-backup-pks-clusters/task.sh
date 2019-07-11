@@ -20,5 +20,5 @@ pushd pks-clusters-backup-artifact
     --all-deployments \
     backup --with-manifest
 
-  tar -cvf pks-clusters-backup.tar -- *
+  tar -cvf pks-clusters-backup.tar --remove-files -- */*
 popd
