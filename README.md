@@ -8,8 +8,6 @@ This is a collection of [Concourse](https://concourse.ci) tasks for backing up a
 - [bbr-cleanup-director](tasks/bbr-cleanup-director/task.yml): Run `bbr director backup-cleanup`
 - [check-opsman-status](tasks/check-opsman-status/task.yml): Check `Apply changes` is not inflight before taking a backup. If it is, the task fails. This should prevent a backup from taking place. Please refer to the [example](examples/) pipelines to see how the task is used.
 
-
-
 ### DEPRECATED - ERT
 - [bbr-backup-ert](tasks/bbr-backup-ert/task.yml): Run `bbr deployment backup` for ERT
 - [bbr-cleanup-ert](tasks/bbr-cleanup-ert/task.yml): Run `bbr deployment backup-cleanup` for ERT
@@ -32,6 +30,12 @@ This is a collection of [Concourse](https://concourse.ci) tasks for backing up a
 ---
 
 ## Requirements
+
+### GitHub Account
+
+For Concourse to pull the tasks it needs to reach out to GitHub. We use the SSH method to download the tasks from GitHub in the example pipelines and we strongly recommend that the HTTPS method is not used. Concourse typically polls GitHub for any changes to the target Git repo and the HTTPS method is subject to rate limits. The SSH method is not subject to the same rate limits as it authenticates the client against a GitHub user which has much higher limits.
+
+Please [create](https://help.github.com/en/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) and [add](https://help.github.com/en/articles/adding-a-new-ssh-key-to-your-github-account) and SSH key to your GitHub account as this will needs to be used in the [pipeline secrets](https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks/blob/master/examples/pks-secrets.yml#L2).
 
 ### Networking
 
