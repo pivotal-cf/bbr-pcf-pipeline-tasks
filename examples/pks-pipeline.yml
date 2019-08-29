@@ -68,10 +68,7 @@ jobs:
   - task: export-om-installation
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
     params:
-      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
-      OPSMAN_URL: ((opsman-url))
-      OPSMAN_USERNAME: ((opsman-username))
-      OPSMAN_PASSWORD: ((opsman-password))
+      <<: *opsman_credentials  
   - put: om-backup-bucket
     params:
       file: om-installation/installation.zip
