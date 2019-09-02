@@ -41,7 +41,7 @@ Please [create](https://help.github.com/en/articles/generating-a-new-ssh-key-and
 
 To use any of these tasks, apart from `export-om-installation`, you will need either:
 - a Concourse worker with access to your Ops Manager private networks. You can find an example template for deploying an external worker in a different network to your Concourse deployment [here](https://github.com/concourse/concourse-bosh-deployment/blob/master/cluster/external-worker.yml)
-- or, provide the `OPSMAN_PRIVATE_KEY` to use a SSH tunnel via the Ops Manager VM. Please note, using a SSH tunnel may increase the time taken to drain backup artifacts. Backup artifacts can be very large and using a SSH tunnel will be a significant overhead on network performance.
+- or, provide the `OPSMAN_PRIVATE_KEY` to use a SSH tunnel via the Ops Manager VM. This key **is not required** if your concourse worker **has access** to the Ops Manager **private networks**. Please note, using a SSH tunnel may increase the time taken to drain backup artifacts. Backup artifacts can be very large and using a SSH tunnel will be a significant overhead on network performance.
 
 ### Disk space
 
