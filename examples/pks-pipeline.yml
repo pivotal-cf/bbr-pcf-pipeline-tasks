@@ -38,25 +38,25 @@ resources:
   type: s3
   source:
     <<: *s3_credentials
-    regexp: installation_(.*).zip
+    versioned_file: installation.zip
 
 - name: director-backup-bucket
   type: s3
   source:
     <<: *s3_credentials
-    regexp: director-backup_(.*).tar
+    versioned_file: director-backup.tar
 
 - name: pks-backup-bucket
   type: s3
   source:
     <<: *s3_credentials
-    versioned_file: pks-backup_(.*).tar
+    versioned_file: pks-backup.tar
 
 - name: pks-clusters-backup-bucket
   type: s3
   source:
     <<: *s3_credentials
-    versioned_file: pks-clusters-backup_(.*).tar
+    versioned_file: pks-clusters-backup.tar
 
 jobs:
 - name: export-om-installation
@@ -74,7 +74,7 @@ jobs:
       OPSMAN_PASSWORD: ((opsman-password))
   - put: om-backup-bucket
     params:
-      file: om-installation/installation_*.zip
+      file: om-installation/installation.zip
 
 - name: bbr-backup-pks-foundation
   serial: true
@@ -123,13 +123,13 @@ jobs:
   - in_parallel:
     - put: director-backup-bucket
       params:
-        file: director-backup-artifact/director-backup_*.tar
+        file: director-backup-artifact/director-backup.tar
     - put: pks-backup-bucket
       params:
-        file: pks-backup-artifact/pks-backup_*.tar
+        file: pks-backup-artifact/pks-backup.tar
     - put: pks-clusters-backup-bucket
       params:
-        file: pks-clusters-backup-artifact/pks-clusters-backup_*.tar
+        file: pks-clusters-backup-artifact/pks-clusters-backup.tar
   ensure:
     task: unlock-pks
     file: bbr-pipeline-tasks-repo/tasks/unlock-pks/task.yml
