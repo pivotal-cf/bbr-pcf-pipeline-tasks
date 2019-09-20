@@ -9,6 +9,7 @@ source "$scripts/export-director-metadata"
 # shellcheck disable=SC1090
 source "$scripts/export-pks-metadata"
 
+current_date=$(date +"%Y-%m-%d-%H-%M-%S")
 
 pushd pks-clusters-backup-artifact
   # shellcheck disable=SC1090
@@ -20,5 +21,5 @@ pushd pks-clusters-backup-artifact
     --all-deployments \
     backup --with-manifest
 
-  tar -cvf pks-clusters-backup.tar --remove-files -- */*
+  tar -cvf pks-clusters-backup_$current_date.tar --remove-files -- */*
 popd
