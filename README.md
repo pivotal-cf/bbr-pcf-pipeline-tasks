@@ -8,9 +8,6 @@ This is a collection of [Concourse](https://concourse.ci) tasks for backing up a
 - [bbr-cleanup-director](tasks/bbr-cleanup-director/task.yml): Run `bbr director backup-cleanup`
 - [check-opsman-status](tasks/check-opsman-status/task.yml): Check `Apply changes` is not inflight before taking a backup. If it is, the task fails. This should prevent a backup from taking place. Please refer to the [example](examples/) pipelines to see how the task is used.
 
-### DEPRECATED - ERT
-- [bbr-backup-ert](tasks/bbr-backup-ert/task.yml): Run `bbr deployment backup` for ERT
-- [bbr-cleanup-ert](tasks/bbr-cleanup-ert/task.yml): Run `bbr deployment backup-cleanup` for ERT
 
 ### PAS
 - [bbr-backup-pas](tasks/bbr-backup-pas/task.yml): Run `bbr deployment backup` for PAS
@@ -63,9 +60,9 @@ There are a variety of storage resources such as [S3](https://github.com/concour
 
 ### HTTP Proxies
 
-BBR tasks for backing up deployments (pas, pks & ert) leverage the BOSH API and will result in HTTP requests to the director. 
+BBR tasks for backing up deployments use the BOSH API and will result in HTTP requests to the director.
 
-Setting the `SET_NO_PROXY` parameter on the tasks will result in a `NO_PROXY` environment variable being exported that contains the BOSH Director IP. 
+Setting the `SET_NO_PROXY` parameter on the tasks will result in a `NO_PROXY` environment variable being exported that contains the BOSH Director IP.
 
 ```yaml
 - task: bbr-backup-pas
