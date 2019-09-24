@@ -50,13 +50,13 @@ resources:
   type: s3
   source:
     <<: *s3_credentials
-    versioned_file: pks-backup_(.*).tar
+    regexp: pks-backup_(.*).tar
 
 - name: pks-clusters-backup-bucket
   type: s3
   source:
     <<: *s3_credentials
-    versioned_file: pks-clusters-backup_(.*).tar
+    regexp: pks-clusters-backup_(.*).tar
 
 jobs:
 - name: export-om-installation
