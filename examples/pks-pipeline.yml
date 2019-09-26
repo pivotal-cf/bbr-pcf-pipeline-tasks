@@ -27,6 +27,7 @@ resources:
     uri: git@github.com:pivotal-cf/bbr-pcf-pipeline-tasks.git
     private_key: ((git-private-key))
     branch: master
+    tag_filter: ((bbr-pipeline-tasks-repo-version))
 
 - name: bbr-release
   type: pivnet
