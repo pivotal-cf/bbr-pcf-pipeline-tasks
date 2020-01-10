@@ -21,7 +21,7 @@ if om_cmd curl -p /api/v0/deployed/director/credentials/uaa_bbr_client_credentia
   bosh_product_guid="$(om_cmd curl -p /api/v0/deployed/products | jq -r '.[] | select(.type=="p-bosh") | .guid')"
   BOSH_ENVIRONMENT="$(om_cmd curl -p "/api/v0/deployed/products/${bosh_product_guid}/static_ips" | jq -r .[0].ips[0])"
 
-  om_cmd curl -p /api/v0/certificate_authorities | jq -r .certificate_authorities[0].cert_pem > "$BOSH_CA_CERT_PATH"
+  om_cmd curl -p /api/v0/certificate_authorities | jq -r '.certificate_authorities | last.cert_pem' > "$BOSH_CA_CERT_PATH"
 else
   echo "Retreving Ops Manager client credentials for BOSH Director"
   om_cmd curl -p /api/v0/deployed/director/manifest > director_manifest.json
