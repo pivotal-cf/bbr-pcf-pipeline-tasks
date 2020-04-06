@@ -20,7 +20,7 @@ source "$scripts/export-director-metadata"
 # shellcheck disable=SC1090
 source "$scripts/export-pks-metadata"
 
-bosh -d "$DEPLOYMENT_NAME" ssh -c "sudo /var/vcap/bosh/bin/monit stop pks-api"
+bosh -d "$DEPLOYMENT_NAME" ssh pivotal-container-service -c "sudo /var/vcap/bosh/bin/monit stop pks-api"
 
 TIMEOUT=60
 
