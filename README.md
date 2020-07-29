@@ -1,6 +1,6 @@
 # BBR PCF Pipeline Tasks
 
-This is a collection of [Concourse](https://concourse.ci) tasks for backing up a [Pivotal Cloud Foundry](https://pivotal.io/platform) installation using [bbr](https://github.com/cloudfoundry-incubator/bosh-backup-and-restore).
+This is a collection of [Concourse](https://concourse.ci) tasks for backing up a [Pivotal Cloud Foundry](https://pivotal.io/platform) installation using [bbr](https://github.com/cloudfoundry-incubator/bosh-backup-and-restore)..
 
 ### All Foundations
 - [export-om-installation](tasks/export-om-installation/task.yml): Export Ops Manager installation settings
