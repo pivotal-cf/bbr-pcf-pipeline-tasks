@@ -8,11 +8,11 @@ image_resource:
     tag: final
 
 inputs:
-- name: backup-and-restore-ci
+- name: bbr-pipeline-tasks-repo
 - name: pipeline
 
 run:
-  path: backup-and-restore-ci/tasks/validate-pipeline/task.sh
+  path: bbr-pipeline-tasks-repo/ci/tasks/validate-pipeline/task.sh
 
 params:
   PIPELINE_PATH:

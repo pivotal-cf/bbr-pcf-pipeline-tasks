@@ -40,7 +40,6 @@ jobs:
       trigger: true
     - get: bbr-pipeline-tasks-repo
       trigger: true
-    - get: bbr-pipeline-tasks-repo
   - task: validate-pipeline
     file: bbr-pipeline-tasks-repo/ci/tasks/validate-pipeline/task.yml
     input_mapping:
@@ -172,7 +171,6 @@ jobs:
       trigger: true
       resource: bbr-pipeline-tasks-prs
       passed: [trigger-pr]
-    - get: bbr-pipeline-tasks-repo
   - put: bbr-pipeline-tasks-prs
     params:
       context: validation-of-sample-pas-pipeline
