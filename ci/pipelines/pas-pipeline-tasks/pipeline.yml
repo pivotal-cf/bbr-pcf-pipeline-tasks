@@ -40,9 +40,9 @@ jobs:
       trigger: true
     - get: bbr-pipeline-tasks-repo
       trigger: true
-    - get: backup-and-restore-ci
+    - get: bbr-pipeline-tasks-repo
   - task: validate-pipeline
-    file: backup-and-restore-ci/tasks/validate-pipeline/task.yml
+    file: bbr-pipeline-tasks-repo/ci/tasks/validate-pipeline/task.yml
     input_mapping:
       pipeline: bbr-pipeline-tasks-repo
     params:
@@ -56,7 +56,6 @@ jobs:
         source:
           repository: pcfplatformrecovery/backup-and-restore
       inputs:
-      - name: backup-and-restore-ci
       - name: bbr-pipeline-tasks-repo
       run:
         path: bash
@@ -71,11 +70,11 @@ jobs:
 
           yamldiff \
             --file1 bbr-pipeline-tasks-repo/examples/pas-pipeline.yml \
-            --file2 backup-and-restore-ci/pipelines/pas-pipeline-tasks/pipeline.yml
+            --file2 bbr-pipeline-tasks-repo/ci/pipelines/pas-pipeline-tasks/pipeline.yml
 
           exit "$(yamldiff \
             --file1 bbr-pipeline-tasks-repo/examples/pas-pipeline.yml \
-            --file2 backup-and-restore-ci/pipelines/pas-pipeline-tasks/pipeline.yml \
+            --file2 bbr-pipeline-tasks-repo/ci/pipelines/pas-pipeline-tasks/pipeline.yml \
             | grep '^\-' | grep -v 'OPSMAN_PRIVATE_KEY' | grep -v 'tag_filter' | wc -l)"
 
 - name: export-om-installation
@@ -173,14 +172,14 @@ jobs:
       trigger: true
       resource: bbr-pipeline-tasks-prs
       passed: [trigger-pr]
-    - get: backup-and-restore-ci
+    - get: bbr-pipeline-tasks-repo
   - put: bbr-pipeline-tasks-prs
     params:
       context: validation-of-sample-pas-pipeline
       path: bbr-pipeline-tasks-repo
       status: pending
   - task: validate-pipeline
-    file: backup-and-restore-ci/tasks/validate-pipeline/task.yml
+    file: bbr-pipeline-tasks-repo/ci/tasks/validate-pipeline/task.yml
     input_mapping:
       pipeline: bbr-pipeline-tasks-repo
     params:
@@ -459,13 +458,6 @@ resource_types:
     tag: latest
 
 resources:
-- name: backup-and-restore-ci
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry-incubator/backup-and-restore-ci.git
-    branch: master
-    private_key: ((git-private-key))
-
 - name: bbr-pipeline-tasks-repo
   type: git
   source:
