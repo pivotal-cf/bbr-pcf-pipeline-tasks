@@ -475,6 +475,8 @@ resources:
 - name: bbr-pipeline-tasks-prs
   type: pull-request
   source:
+    disable_forks: true
+    only_mergeable: true
     access_token: ((github.access_token))
     private_key: ((github.ssh_key))
     repo: pivotal-cf/bbr-pcf-pipeline-tasks
