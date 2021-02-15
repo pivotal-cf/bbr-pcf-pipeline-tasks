@@ -1,17 +1,17 @@
 ---
 opsman_credentials: &opsman_credentials
-  SKIP_SSL_VALIDATION: ((skip-ssl-validation))
-  OPSMAN_URL: ((opsman-url))
-  OPSMAN_USERNAME: ((opsman-username))
-  OPSMAN_PASSWORD: ((opsman-password))
-  OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+  SKIP_SSL_VALIDATION: ((opsman.skip-ssl-validation))
+  OPSMAN_URL: ((opsman.url))
+  OPSMAN_USERNAME: ((opsman.username))
+  OPSMAN_PASSWORD: ((opsman.password))
+  OPSMAN_PRIVATE_KEY: ((opsman.private-key))
 
 s3_credentials: &s3_credentials
-  bucket: ((storage-backup-bucket))
-  region_name: ((storage-region))
-  access_key_id: ((storage-access-key-id))
-  secret_access_key: ((storage-secret-access-key))
-  endpoint: ((storage-endpoint))
+  bucket: ((storage.backup-bucket))
+  region_name: ((storage.region))
+  access_key_id: ((storage.access-key-id))
+  secret_access_key: ((storage.secret-access-key))
+  endpoint: ((storage.endpoint))
 
 jobs:
 - name: export-om-installation
@@ -22,10 +22,10 @@ jobs:
   - task: export-om-installation
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
     params:
-      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
-      OPSMAN_URL: ((opsman-url))
-      OPSMAN_USERNAME: ((opsman-username))
-      OPSMAN_PASSWORD: ((opsman-password))
+      SKIP_SSL_VALIDATION: ((opsman.skip-ssl-validation))
+      OPSMAN_URL: ((opsman.url))
+      OPSMAN_USERNAME: ((opsman.username))
+      OPSMAN_PASSWORD: ((opsman.password))
   - put: om-backup-artifact
     params:
       file: om-installation/installation_*.zip
@@ -112,5 +112,5 @@ resources:
 - name: bbr-release
   type: pivnet
   source:
-    api_token: ((pivnet-api-token))
+    api_token: ((pivnet.api-token))
     product_slug: p-bosh-backup-and-restore
