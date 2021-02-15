@@ -1,17 +1,17 @@
 ---
 opsman_credentials: &opsman_credentials
-  SKIP_SSL_VALIDATION: ((skip-ssl-validation))
-  OPSMAN_URL: ((opsman-url))
-  OPSMAN_USERNAME: ((opsman-username))
-  OPSMAN_PASSWORD: ((opsman-password))
-  OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+  SKIP_SSL_VALIDATION: ((opsman.skip-ssl-validation))
+  OPSMAN_URL: ((opsman.url))
+  OPSMAN_USERNAME: ((opsman.username))
+  OPSMAN_PASSWORD: ((opsman.password))
+  OPSMAN_PRIVATE_KEY: ((opsman.private-key))
 
 s3_credentials: &s3_credentials
-  bucket: ((storage-backup-bucket))
-  region_name: ((storage-region))
-  access_key_id: ((storage-access-key-id))
-  secret_access_key: ((storage-secret-access-key))
-  endpoint: ((storage-endpoint))
+  bucket: ((storage.backup-bucket))
+  region_name: ((storage.region))
+  access_key_id: ((storage.access-key-id))
+  secret_access_key: ((storage.secret-access-key))
+  endpoint: ((storage.endpoint))
 
 groups:
 - name: master
@@ -87,10 +87,10 @@ jobs:
   - task: export-om-installation
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
     params:
-      OPSMAN_PASSWORD: ((opsman-password))
-      OPSMAN_URL: ((opsman-url))
-      OPSMAN_USERNAME: ((opsman-username))
-      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+      OPSMAN_PASSWORD: ((opsman.password))
+      OPSMAN_URL: ((opsman.url))
+      OPSMAN_USERNAME: ((opsman.username))
+      SKIP_SSL_VALIDATION: ((opsman.skip-ssl-validation))
   - put: om-backup-artifact
     params:
       file: om-installation/installation_*.zip
@@ -117,13 +117,13 @@ jobs:
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pas/task.yml
     params:
       <<: *opsman_credentials
-      OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+      OPSMAN_PRIVATE_KEY: ((opsman.private-key))
     on_failure:
       task: bbr-cleanup-pas
       file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pas/task.yml
       params:
         <<: *opsman_credentials
-        OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+        OPSMAN_PRIVATE_KEY: ((opsman.private-key))
   - put: pas-backup-bucket
     params:
       file: pas-backup-artifact/pas-backup_*.tar
@@ -250,7 +250,7 @@ jobs:
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pas/task.yml
     params:
       <<: *opsman_credentials
-      OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+      OPSMAN_PRIVATE_KEY: ((opsman.private-key))
     on_failure:
       put: bbr-pipeline-tasks-prs
       params:
@@ -321,7 +321,7 @@ jobs:
     file: bbr-pipeline-tasks-prs/tasks/bbr-cleanup-pas/task.yml
     params:
       <<: *opsman_credentials
-      OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+      OPSMAN_PRIVATE_KEY: ((opsman.private-key))
     input_mapping:
       bbr-pipeline-tasks-repo: bbr-pipeline-tasks-prs
     on_failure:
@@ -461,7 +461,7 @@ resources:
   source:
     branch: master
     uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
-    private_key: ((git-private-key))
+    private_key: ((github.ssh_key))
     ignore_paths:
     - docker/*
     - README.md
@@ -475,8 +475,8 @@ resources:
 - name: bbr-pipeline-tasks-prs
   type: pull-request
   source:
-    access_token: ((github-access-token))
-    private_key: ((git-private-key))
+    access_token: ((github.access_token))
+    private_key: ((github.ssh_key))
     repo: pivotal-cf/bbr-pcf-pipeline-tasks
     uri: git@github.com:pivotal-cf/bbr-pcf-pipeline-tasks.git
     ignore_paths:
@@ -510,7 +510,7 @@ resources:
 - name: bbr-release
   type: pivnet
   source:
-    api_token: ((pivnet-api-token))
+    api_token: ((pivnet.api-token))
     product_slug: p-bosh-backup-and-restore
 
 - name: 6h
