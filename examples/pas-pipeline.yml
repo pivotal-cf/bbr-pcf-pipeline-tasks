@@ -93,7 +93,6 @@ resources:
   source:
     uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
     branch: master
-    tag_filter: ((bbr-pipeline-tasks-repo-version))
 - name: om-backup-artifact
   type: s3
   source:
