@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  icebox:
+    image: cryogenics/bbr-pcf-pipeline-tasks-icebox:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on: ["cryogenics"]
+    volumes:
+      - custom-settings:/home/cryogenist
+      - .:/home/cryogenist/workspace:cached
+
+volumes:
+  custom-settings:
