@@ -163,6 +163,7 @@ jobs:
   serial: true
   plan:
   - get: bbr-pipeline-tasks-prs
+    trigger: true
 
 - name: validate-sample-pipeline-prs
   plan:
