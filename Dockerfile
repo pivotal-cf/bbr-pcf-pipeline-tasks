@@ -1,0 +1,1 @@
+FROM cryogenics/icebox:latest
