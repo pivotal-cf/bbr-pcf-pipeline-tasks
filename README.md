@@ -60,9 +60,11 @@ There are a variety of storage resources such as [S3](https://github.com/concour
 
 ### HTTP Proxies
 
-BBR tasks for backing up deployments use the BOSH API and will result in HTTP requests to the director.
+BBR tasks for backing up deployments use the BOSH API and will result in HTTP requests to the director. 
 
-Setting the `SET_NO_PROXY` parameter on the tasks will result in a `NO_PROXY` environment variable being exported that contains the BOSH Director IP.
+If you wish, you can directly influence which requests go through a proxy and which do not by setting the `BOSH_ALL_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` environment variables for your backup task. BOSH API and HTTP requests will then use the proxies identified in `BOSH_ALL_PROXY` and `HTTPS_PROXY` by default, except for requests to addresses specified in `NO_PROXY`, which will be made directly.
+
+A common pattern is to use a proxy for the majority of your network communication, but to exclude the bosh director. For this use-case, you can set the `SET_NO_PROXY` environment variable to `true`in your backup task. This will have the effect of prepending the BOSH director IP to the `NO_PROXY` environment variable. If the `SET_NO_PROXY` environment variable is unset or is set to any value other than `true`, then the `NO_PROXY` environment variable will not be changed.
 
 ```yaml
 - task: bbr-backup-pas
