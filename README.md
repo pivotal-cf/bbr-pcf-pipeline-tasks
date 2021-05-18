@@ -60,11 +60,35 @@ There are a variety of storage resources such as [S3](https://github.com/concour
 
 ### HTTP Proxies
 
-BBR tasks for backing up deployments use the BOSH API and will result in HTTP requests to the director. 
+The BBR task for backing up deployments will communicate with the BOSH API.
 
-If you wish, you can directly influence which requests go through a proxy and which do not by setting the `BOSH_ALL_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` environment variables for your backup task. BOSH API and HTTP requests will then use the proxies identified in `BOSH_ALL_PROXY` and `HTTPS_PROXY` by default, except for requests to addresses specified in `NO_PROXY`, which will be made directly.
+You can proxy this request by setting the `BOSH_ALL_PROXY` environment variable:
 
-A common pattern is to use a proxy for the majority of your network communication, but to exclude the bosh director. For this use-case, you can set the `SET_NO_PROXY` environment variable to `true`in your backup task. This will have the effect of prepending the BOSH director IP to the `NO_PROXY` environment variable. If the `SET_NO_PROXY` environment variable is unset or is set to any value other than `true`, then the `NO_PROXY` environment variable will not be changed.
+- `BOSH_ALL_PROXY` :: Proxy used to reach the bosh director. Example:
+  `ssh+socks5://ubuntu@1.22.33.444:22`
+
+In addition, you may be in the habit of proxying other requests using
+the `HTTPS_PROXY` environment variable. This is common if, for
+example, you have a concourse deployed on one k8s cluster that is
+usually used to test apps deployed to another k8s cluster.
+
+- `HTTPS_PROXY` :: Proxy for all other requests. Example:
+  `proxy.example.com`
+
+You can also set the `NO_PROXY` environment variable with a list of
+IPs, IP prefixes, or domains where the proxy should not be used. This
+will cause BBR and other utilities to ignore `BOSH_ALL_PROXY` and
+`HTTPS_PROXY` for requests to those addresses. BBR uses [standard go
+libraries](https://pkg.go.dev/golang.org/x/net/http/httpproxy) for
+interpreting `NO_PROXY`, and so will behave similarly to other
+utilities.
+
+A common pattern is to use a proxy for the majority of your network
+communication, but to exclude the bosh director. For this use-case,
+you can set the `SET_NO_PROXY` environment variable to `true`in your
+backup task. This will have the effect of prepending the BOSH director
+IP to the `NO_PROXY` list. Otherwise, the `NO_PROXY` environment
+variable will not be changed.
 
 ```yaml
 - task: bbr-backup-pas
