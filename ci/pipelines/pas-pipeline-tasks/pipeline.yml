@@ -14,7 +14,7 @@ s3_credentials: &s3_credentials
   endpoint: ((storage.endpoint))
 
 groups:
-- name: master
+- name: main
   jobs:
   - validate-sample-pipeline
   - export-om-installation
@@ -460,7 +460,7 @@ resources:
 - name: bbr-pipeline-tasks-repo
   type: git
   source:
-    branch: master
+    branch: main
     uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
     private_key: ((github.ssh_key))
     ignore_paths:
