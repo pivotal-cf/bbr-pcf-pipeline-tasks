@@ -14,146 +14,14 @@ s3_credentials: &s3_credentials
   endpoint: ((storage.endpoint))
 
 jobs:
-# - name: validate-sample-pipeline
-#   plan:
-#   - in_parallel:
-#     - get: 6h
-#       trigger: true
-#     - get: bbr-pipeline-tasks-repo
-#       trigger: true
-#   - task: validate-pipeline
-#     file: bbr-pipeline-tasks-repo/ci/tasks/validate-pipeline/task.yml
-#     input_mapping:
-#       pipeline: bbr-pipeline-tasks-repo
-#     params:
-#       PIPELINE_PATH: examples/pas-pipeline.yml
-#       SECRETS_PATH: examples/pas-secrets.yml
-#   - task: ensure-ci-includes-sample-pipeline
-#     config:
-#       platform: linux
-#       image_resource:
-#         type: docker-image
-#         source:
-#           repository: pcfplatformrecovery/backup-and-restore
-#       inputs:
-#       - name: bbr-pipeline-tasks-repo
-#       run:
-#         path: bash
-#         args:
-#         - -euc
-#         - |
-#           set -o pipefail
-#
-#           git config --global --remove-section url."git@github.com:"
-#
-#           go get -u github.com/sahilm/yamldiff
-#
-#           yamldiff \
-#             --file1 bbr-pipeline-tasks-repo/examples/pas-pipeline.yml \
-#             --file2 bbr-pipeline-tasks-repo/ci/pipelines/pas-pipeline-tasks/pipeline.yml
-#
-#           exit "$(yamldiff \
-#             --file1 bbr-pipeline-tasks-repo/examples/pas-pipeline.yml \
-#             --file2 bbr-pipeline-tasks-repo/ci/pipelines/pas-pipeline-tasks/pipeline.yml \
-#             | grep '^\-' | grep -v 'OPSMAN_PRIVATE_KEY' | grep -v 'tag_filter' | wc -l)"
-#
-# - name: export-om-installation
-#   serial: true
-#   plan:
-#   - in_parallel:
-#     - get: 6h
-#       trigger: true
-#     - get: bbr-pipeline-tasks-repo
-#       trigger: true
-#   - task: export-om-installation
-#     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
-#     params:
-#       OPSMAN_PASSWORD: ((opsman.password))
-#       OPSMAN_URL: ((opsman.url))
-#       OPSMAN_USERNAME: ((opsman.username))
-#       SKIP_SSL_VALIDATION: ((opsman.skip-ssl-validation))
-#   - put: om-backup-artifact
-#     params:
-#       file: om-installation/installation_*.zip
-#
-# - name: bbr-backup-pas
-#   serial: true
-#   serial_groups:
-#   - backup-pas
-#   plan:
-#   - in_parallel:
-#     - get: 6h
-#       trigger: true
-#     - get: bbr-pipeline-tasks-repo
-#       trigger: true
-#     - get: bbr-release
-#       trigger: true
-#   - task: check-opsman-status
-#     file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
-#     params:
-#       <<: *opsman_credentials
-#   - task: extract-binary
-#     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-#   - task: bbr-backup-pas
-#     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pas/task.yml
-#     params:
-#       <<: *opsman_credentials
-#       OPSMAN_PRIVATE_KEY: ((opsman.private-key))
-#     on_failure:
-#       task: bbr-cleanup-pas
-#       file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pas/task.yml
-#       params:
-#         <<: *opsman_credentials
-#         OPSMAN_PRIVATE_KEY: ((opsman.private-key))
-#   - put: pas-backup-bucket
-#     params:
-#       file: pas-backup-artifact/pas-backup_*.tar
-#
-# - name: bbr-backup-director
-#   serial: true
-#   serial_groups:
-#   - backup-director
-#   plan:
-#   - in_parallel:
-#     - get: 6h
-#       trigger: true
-#     - get: bbr-pipeline-tasks-repo
-#       trigger: true
-#     - get: bbr-release
-#       trigger: true
-#   - task: check-opsman-status
-#     file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
-#     params:
-#       <<: *opsman_credentials
-#   - task: extract-binary
-#     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-#   - task: bbr-backup-director
-#     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
-#     params:
-#       <<: *opsman_credentials
-#     on_failure:
-#       task: bbr-cleanup-director
-#       file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.yml
-#       params:
-#         <<: *opsman_credentials
-#   - put: director-backup-bucket
-#     params:
-#       file: director-backup-artifact/director-backup_*.tar
-
-- name: trigger-pr
-  serial: true
-  plan:
-  - get: bbr-pipeline-tasks-repo
-    trigger: true
-    version: every
-
 - name: validate-sample-pipeline
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [trigger-pr]
+    - get: six-hours
+      trigger: true
   - put: bbr-pipeline-tasks-repo
     params:
       context: validation-of-sample-pas-pipeline
@@ -182,10 +50,12 @@ jobs:
 - name: export-om-installation
   serial: true
   plan:
-  - get: bbr-pipeline-tasks-repo
-    trigger: true
-    version: every
-    passed: [trigger-pr]
+  - in_parallel:
+    - get: bbr-pipeline-tasks-repo
+      trigger: true
+      version: every
+    - get: six-hours
+      trigger: true
   - put: bbr-pipeline-tasks-repo
     params:
       context: export-om-installation
@@ -220,8 +90,9 @@ jobs:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [trigger-pr]
     - get: bbr-release
+    - get: six-hours
+      trigger: true
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-pas
@@ -259,8 +130,9 @@ jobs:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [trigger-pr]
     - get: bbr-release
+    - get: six-hours
+      trigger: true
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-director
@@ -288,7 +160,7 @@ jobs:
     params:
       file: director-backup-artifact/director-backup_*.tar
 
-- name: bbr-cleanup-pas-repo
+- name: bbr-cleanup-pas
   serial: true
   serial_groups:
   - backup-pas
@@ -297,12 +169,13 @@ jobs:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [trigger-pr]
     - get: bbr-release
+    - get: six-hours
+      trigger: true
   - task: extract-binary
-    file: bbr-pipeline-tasks-prs/tasks/extract-bbr-binary/task.yml
-  - task: bbr-cleanup-pas-prs
-    file: bbr-pipeline-tasks-prs/tasks/bbr-cleanup-pas/task.yml
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
+  - task: bbr-cleanup-pas
+    file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pas/task.yml
     params:
       <<: *opsman_credentials
       OPSMAN_PRIVATE_KEY: ((opsman.private-key))
@@ -328,12 +201,13 @@ jobs:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [trigger-pr]
     - get: bbr-release
+    - get: six-hours
+      trigger: true
   - task: extract-binary
-    file: bbr-pipeline-tasks-prs/tasks/extract-bbr-binary/task.yml
-  - task: bbr-cleanup-director-prs
-    file: bbr-pipeline-tasks-prs/tasks/bbr-cleanup-director/task.yml
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
+  - task: bbr-cleanup-directors
+    file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.yml
     params:
       <<: *opsman_credentials
     on_failure:
@@ -352,21 +226,29 @@ jobs:
 - name: check-opsman-status
   serial: true
   plan:
-  - get: bbr-pipeline-tasks-repo
-    trigger: true
-    version: every
-    passed:
-    - validate-sample-pipeline
-    - export-om-installation
-    - bbr-backup-director
-    - bbr-backup-pas
+  - in_parallel:
+    - get: bbr-pipeline-tasks-repo
+      trigger: true
+      version: every
+      passed:
+      - validate-sample-pipeline
+      - export-om-installation
+      - bbr-backup-director
+      - bbr-backup-pas
+    - get: six-hours
+      trigger: true
+      passed:
+      - validate-sample-pipeline
+      - export-om-installation
+      - bbr-backup-director
+      - bbr-backup-pas
   - put: bbr-pipeline-tasks-repo
     params:
       context: check-opsman-status
       path: bbr-pipeline-tasks-repo
       status: pending
   - task: check-opsman-status
-    file: bbr-pipeline-tasks-prs/tasks/check-opsman-status/task.yml
+    file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
     params:
       <<: *opsman_credentials
     on_failure:
@@ -477,10 +359,10 @@ resources:
     api_token: ((pivnet.api_token))
     product_slug: p-bosh-backup-and-restore
 
-# - name: six-hours
-#   type: time
-#   source:
-#     interval: 6h
-#     start: 9:00 AM
-#     stop: 5:00 PM
-#     days: [Monday, Tuesday, Wednesday, Thursday, Friday]
+- name: six-hours
+  type: time
+  source:
+    interval: 6h
+    start: 9:00 AM
+    stop: 5:00 PM
+    days: [Monday, Tuesday, Wednesday, Thursday, Friday]
