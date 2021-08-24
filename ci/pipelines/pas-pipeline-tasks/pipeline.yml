@@ -1,11 +1,4 @@
 ---
-opsman_credentials: &opsman_credentials
-  SKIP_SSL_VALIDATION: ((opsman.skip-ssl-validation))
-  OPSMAN_URL: ((opsman.url))
-  OPSMAN_USERNAME: ((opsman.username))
-  OPSMAN_PASSWORD: ((opsman.password))
-  OPSMAN_PRIVATE_KEY: ((opsman.private-key))
-
 s3_credentials: &s3_credentials
   bucket: ((storage.backup-bucket))
   region_name: ((storage.region))
@@ -14,7 +7,7 @@ s3_credentials: &s3_credentials
   endpoint: ((storage.endpoint))
 
 jobs:
-- name: validate-sample-pipeline
+- name: claim-env
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
@@ -22,6 +15,23 @@ jobs:
       version: every
     - get: six-hours
       trigger: true
+    - put: tas-lts
+      params:
+        action: claim
+
+- name: validate-sample-pipeline
+  plan:
+  - in_parallel:
+    - get: bbr-pipeline-tasks-repo
+      trigger: true
+      version: every
+      passed: [claim-env]
+    - get: six-hours
+      trigger: true
+      passed: [claim-env]
+    - get: tas-lts
+      trigger: true
+      passed: [claim-env]
   - put: bbr-pipeline-tasks-repo
     params:
       context: validation-of-sample-pas-pipeline
@@ -54,17 +64,28 @@ jobs:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
+      passed: [claim-env]
     - get: six-hours
       trigger: true
+      passed: [claim-env]
+    - get: tas-lts
+      trigger: true
+      passed: [claim-env]
   - put: bbr-pipeline-tasks-repo
     params:
       context: export-om-installation
       path: bbr-pipeline-tasks-repo
       status: pending
+  - file: tas-lts/metadata
+    format: json
+    load_var: pooled-env
   - task: export-om-installation
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
-    params:
-      <<: *opsman_credentials
+    params: &opsman_credentials
+      OPSMAN_URL: ((.:pooled-env.ops_manager.url))
+      OPSMAN_USERNAME: ((.:pooled-env.ops_manager.username))
+      OPSMAN_PASSWORD: ((.:pooled-env.ops_manager.password))
+      OPSMAN_PRIVATE_KEY: ((.:pooled-env.ops_manager_private_key))
     on_failure:
       put: bbr-pipeline-tasks-repo
       params:
@@ -82,29 +103,33 @@ jobs:
       file: om-installation/installation_*.zip
 
 - name: bbr-backup-pas
-  serial: true
-  serial_groups:
-  - backup-pas
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
+      passed: [claim-env]
     - get: bbr-release
     - get: six-hours
       trigger: true
+      passed: [claim-env]
+    - get: tas-lts
+      trigger: true
+      passed: [claim-env]
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-pas
       path: bbr-pipeline-tasks-repo
       status: pending
+  - file: tas-lts/metadata
+    format: json
+    load_var: pooled-env
   - task: extract-binary
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-pas
     file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pas/task.yml
     params:
       <<: *opsman_credentials
-      OPSMAN_PRIVATE_KEY: ((opsman.private-key))
     on_failure:
       put: bbr-pipeline-tasks-repo
       params:
@@ -117,27 +142,37 @@ jobs:
         context: bbr-backup-pas
         path: bbr-pipeline-tasks-repo
         status: success
-  - put: pas-backup-bucket
-    params:
-      file: pas-backup-artifact/pas-backup_*.tar
+  - in_parallel:
+    - put: pas-backup-bucket
+      params:
+        file: pas-backup-artifact/pas-backup_*.tar
+    - task: bbr-cleanup-pas
+      file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pas/task.yml
+      params:
+        <<: *opsman_credentials
 
 - name: bbr-backup-director
-  serial: true
-  serial_groups:
-  - backup-director
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
+      passed: [claim-env]
     - get: bbr-release
     - get: six-hours
       trigger: true
+      passed: [claim-env]
+    - get: tas-lts
+      trigger: true
+      passed: [claim-env]
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-director
       path: bbr-pipeline-tasks-repo
       status: pending
+  - file: tas-lts/metadata
+    format: json
+    load_var: pooled-env
   - task: extract-binary
     file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
   - task: bbr-backup-director
@@ -156,72 +191,14 @@ jobs:
         context: bbr-backup-director
         path: bbr-pipeline-tasks-repo
         status: success
-  - put: director-backup-bucket
-    params:
-      file: director-backup-artifact/director-backup_*.tar
-
-- name: bbr-cleanup-pas
-  serial: true
-  serial_groups:
-  - backup-pas
-  plan:
   - in_parallel:
-    - get: bbr-pipeline-tasks-repo
-      trigger: true
-      version: every
-    - get: bbr-release
-    - get: six-hours
-      trigger: true
-  - task: extract-binary
-    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-  - task: bbr-cleanup-pas
-    file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pas/task.yml
-    params:
-      <<: *opsman_credentials
-      OPSMAN_PRIVATE_KEY: ((opsman.private-key))
-    on_failure:
-      put: bbr-pipeline-tasks-repo
+    - put: director-backup-bucket
       params:
-        context: bbr-cleanup-pas
-        path: bbr-pipeline-tasks-repo
-        status: failure
-    on_success:
-      put: bbr-pipeline-tasks-repo
+        file: director-backup-artifact/director-backup_*.tar
+    - task: bbr-cleanup-directors
+      file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.yml
       params:
-        context: bbr-cleanup-pas
-        path: bbr-pipeline-tasks-repo
-        status: success
-
-- name: bbr-cleanup-director
-  serial: true
-  serial_groups:
-  - backup-director
-  plan:
-  - in_parallel:
-    - get: bbr-pipeline-tasks-repo
-      trigger: true
-      version: every
-    - get: bbr-release
-    - get: six-hours
-      trigger: true
-  - task: extract-binary
-    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
-  - task: bbr-cleanup-directors
-    file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.yml
-    params:
-      <<: *opsman_credentials
-    on_failure:
-      put: bbr-pipeline-tasks-repo
-      params:
-        context: bbr-cleanup-director
-        path: bbr-pipeline-tasks-repo
-        status: failure
-    on_success:
-      put: bbr-pipeline-tasks-repo
-      params:
-        context: bbr-cleanup-director
-        path: bbr-pipeline-tasks-repo
-        status: success
+        <<: *opsman_credentials
 
 - name: check-opsman-status
   serial: true
@@ -242,11 +219,21 @@ jobs:
       - export-om-installation
       - bbr-backup-director
       - bbr-backup-pas
+    - get: tas-lts
+      trigger: true
+      passed:
+      - validate-sample-pipeline
+      - export-om-installation
+      - bbr-backup-director
+      - bbr-backup-pas
   - put: bbr-pipeline-tasks-repo
     params:
       context: check-opsman-status
       path: bbr-pipeline-tasks-repo
       status: pending
+  - file: tas-lts/metadata
+    format: json
+    load_var: pooled-env
   - task: check-opsman-status
     file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
     params:
@@ -268,7 +255,10 @@ jobs:
       inputs:
       - name: bbr-pipeline-tasks-repo
       params:
-        <<: *opsman_credentials
+        OPSMAN_URL: ((.:pooled-env.ops_manager.url))
+        OPSMAN_USERNAME: ((.:pooled-env.ops_manager.username))
+        OPSMAN_PASSWORD: ((.:pooled-env.ops_manager.password))
+        OPSMAN_PRIVATE_KEY: ((.:pooled-env.ops_manager_private_key))
       run:
         path: /bin/bash
         args:
@@ -304,6 +294,10 @@ jobs:
         context: check-opsman-status
         path: bbr-pipeline-tasks-repo
         status: success
+  - put: tas-lts
+    params:
+      action: unclaim
+      env_file: tas-lts/metadata
 
 resource_types:
 - name: pivnet
@@ -316,6 +310,11 @@ resource_types:
   type: docker-image
   source:
     repository: teliaoss/github-pr-resource
+
+- name: pcf-pool
+  type: docker-image
+  source:
+    repository: cftoolsmiths/toolsmiths-envs-resource
 
 resources:
 - name: bbr-pipeline-tasks-repo
@@ -364,5 +363,12 @@ resources:
   source:
     interval: 6h
     start: 9:00 AM
-    stop: 5:00 PM
+    stop: 11:00 PM
     days: [Monday, Tuesday, Wednesday, Thursday, Friday]
+
+- name: tas-lts
+  type: pcf-pool
+  source:
+    api_token: ((toolsmiths.api_token))
+    hostname: environments.toolsmiths.cf-app.com
+    pool_name: us_2_11_lts2
