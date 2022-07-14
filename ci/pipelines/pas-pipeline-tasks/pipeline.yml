@@ -313,6 +313,13 @@ jobs:
         context: check-opsman-status
         path: bbr-pipeline-tasks-repo
         status: success
+
+- name: #@ 'unclaim-env-' + v["version_slug"]
+  plan:
+  - get: #@ 'tas-' + v["version_slug"]
+    passed:
+    - #@ 'check-opsman-status-' + v["version_slug"]
+    trigger: true
   - put: #@ 'tas-' + v["version_slug"]
     params:
       action: unclaim
