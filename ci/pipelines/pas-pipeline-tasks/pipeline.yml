@@ -15,7 +15,6 @@ s3_credentials: &s3_credentials
 jobs:
 #@ for v in tas_versions:
 - name: #@ 'claim-env-' + v["version_slug"]
-  old_name: claim-env
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
@@ -28,7 +27,6 @@ jobs:
         action: claim
 
 - name: #@ 'validate-sample-pipeline-' + v["version_slug"]
-  old_name: validate-sample-pipeline
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
@@ -70,7 +68,6 @@ jobs:
         status: success
 
 - name: #@ 'export-om-installation-' + v["version_slug"]
-  old_name: export-om-installation
   serial: true
   plan:
   - in_parallel:
@@ -119,7 +116,6 @@ jobs:
       file: om-installation/installation_*.zip
 
 - name: #@ 'bbr-backup-pas-' + v["version_slug"]
-  old_name: bbr-backup-pas
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
@@ -172,7 +168,6 @@ jobs:
         <<: *opsman_credentials
 
 - name: #@ 'bbr-backup-director-' + v["version_slug"]
-  old_name: bbr-backup-director
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
@@ -225,7 +220,6 @@ jobs:
         <<: *opsman_credentials
 
 - name: #@ 'check-opsman-status-' + v["version_slug"]
-  old_name: check-opsman-status
   serial: true
   plan:
   - in_parallel:
