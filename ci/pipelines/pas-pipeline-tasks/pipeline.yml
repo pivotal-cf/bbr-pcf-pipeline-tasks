@@ -1,4 +1,10 @@
 ---
+#! to set pipeline run: fly set-pipeline -p "pas-pipeline-tasks" -c <(ytt -f "ci/pipelines/pas-pipeline-tasks/pipeline.yml")
+
+#@ tas_versions = [
+#@   {"version_slug": "2-11", "pool_name": "us_2_11_lts2" },
+#@ ]
+
 s3_credentials: &s3_credentials
   bucket: ((storage.backup-bucket))
   region_name: ((storage.region))
@@ -7,7 +13,8 @@ s3_credentials: &s3_credentials
   endpoint: ((storage.endpoint))
 
 jobs:
-- name: claim-env-2-11
+#@ for v in tas_versions:
+- name: #@ 'claim-env-' + v["version_slug"]
   old_name: claim-env
   plan:
   - in_parallel:
@@ -20,20 +27,23 @@ jobs:
       params:
         action: claim
 
-- name: validate-sample-pipeline-2-11
+- name: #@ 'validate-sample-pipeline-' + v["version_slug"]
   old_name: validate-sample-pipeline
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: six-hours
       trigger: true
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: tas-lts
       trigger: true
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: validation-of-sample-pas-pipeline
@@ -59,7 +69,7 @@ jobs:
         path: bbr-pipeline-tasks-repo
         status: success
 
-- name: export-om-installation-2-11
+- name: #@ 'export-om-installation-' + v["version_slug"]
   old_name: export-om-installation
   serial: true
   plan:
@@ -67,13 +77,16 @@ jobs:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: six-hours
       trigger: true
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: tas-lts
       trigger: true
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: export-om-installation
@@ -105,21 +118,24 @@ jobs:
     params:
       file: om-installation/installation_*.zip
 
-- name: bbr-backup-pas-2-11
+- name: #@ 'bbr-backup-pas-' + v["version_slug"]
   old_name: bbr-backup-pas
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: bbr-release
     - get: six-hours
       trigger: true
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: tas-lts
       trigger: true
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-pas
@@ -155,21 +171,24 @@ jobs:
       params:
         <<: *opsman_credentials
 
-- name: bbr-backup-director-2-11
+- name: #@ 'bbr-backup-director-' + v["version_slug"]
   old_name: bbr-backup-director
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: bbr-release
     - get: six-hours
       trigger: true
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: tas-lts
       trigger: true
-      passed: [claim-env-2-11]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-director
@@ -205,7 +224,7 @@ jobs:
       params:
         <<: *opsman_credentials
 
-- name: check-opsman-status-2-11
+- name: #@ 'check-opsman-status-' + v["version_slug"]
   old_name: check-opsman-status
   serial: true
   plan:
@@ -214,24 +233,24 @@ jobs:
       trigger: true
       version: every
       passed:
-      - validate-sample-pipeline-2-11
-      - export-om-installation-2-11
-      - bbr-backup-director-2-11
-      - bbr-backup-pas-2-11
+      - #@ 'validate-sample-pipeline-' + v["version_slug"]
+      - #@ 'export-om-installation-' + v["version_slug"]
+      - #@ 'bbr-backup-director-' + v["version_slug"]
+      - #@ 'bbr-backup-pas-' + v["version_slug"]
     - get: six-hours
       trigger: true
       passed:
-      - validate-sample-pipeline-2-11
-      - export-om-installation-2-11
-      - bbr-backup-director-2-11
-      - bbr-backup-pas-2-11
+      - #@ 'validate-sample-pipeline-' + v["version_slug"]
+      - #@ 'export-om-installation-' + v["version_slug"]
+      - #@ 'bbr-backup-director-' + v["version_slug"]
+      - #@ 'bbr-backup-pas-' + v["version_slug"]
     - get: tas-lts
       trigger: true
       passed:
-      - validate-sample-pipeline-2-11
-      - export-om-installation-2-11
-      - bbr-backup-director-2-11
-      - bbr-backup-pas-2-11
+      - #@ 'validate-sample-pipeline-' + v["version_slug"]
+      - #@ 'export-om-installation-' + v["version_slug"]
+      - #@ 'bbr-backup-director-' + v["version_slug"]
+      - #@ 'bbr-backup-pas-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: check-opsman-status
@@ -304,6 +323,7 @@ jobs:
     params:
       action: unclaim
       env_file: tas-lts/metadata
+#@ end
 
 resource_types:
 - name: pivnet
