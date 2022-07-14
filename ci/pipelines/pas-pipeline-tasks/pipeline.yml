@@ -22,7 +22,7 @@ jobs:
       version: every
     - get: six-hours
       trigger: true
-    - put: tas-2-11
+    - put: #@ 'tas-' + v["version_slug"]
       params:
         action: claim
 
@@ -38,7 +38,7 @@ jobs:
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
-    - get: tas-2-11
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
@@ -80,7 +80,7 @@ jobs:
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
-    - get: tas-2-11
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
@@ -89,7 +89,7 @@ jobs:
       context: export-om-installation
       path: bbr-pipeline-tasks-repo
       status: pending
-  - file: tas-2-11/metadata
+  - file: #@ 'tas-' + v["version_slug"] + '/metadata'
     format: json
     load_var: pooled-env
   - task: export-om-installation
@@ -128,7 +128,7 @@ jobs:
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
-    - get: tas-2-11
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
@@ -137,7 +137,7 @@ jobs:
       context: bbr-backup-pas
       path: bbr-pipeline-tasks-repo
       status: pending
-  - file: tas-2-11/metadata
+  - file: #@ 'tas-' + v["version_slug"] + '/metadata'
     format: json
     load_var: pooled-env
   - task: extract-binary
@@ -180,7 +180,7 @@ jobs:
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
-    - get: tas-2-11
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
@@ -189,7 +189,7 @@ jobs:
       context: bbr-backup-director
       path: bbr-pipeline-tasks-repo
       status: pending
-  - file: tas-2-11/metadata
+  - file: #@ 'tas-' + v["version_slug"] + '/metadata'
     format: json
     load_var: pooled-env
   - task: extract-binary
@@ -238,7 +238,7 @@ jobs:
       - #@ 'export-om-installation-' + v["version_slug"]
       - #@ 'bbr-backup-director-' + v["version_slug"]
       - #@ 'bbr-backup-pas-' + v["version_slug"]
-    - get: tas-2-11
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
       - #@ 'validate-sample-pipeline-' + v["version_slug"]
@@ -250,7 +250,7 @@ jobs:
       context: check-opsman-status
       path: bbr-pipeline-tasks-repo
       status: pending
-  - file: tas-2-11/metadata
+  - file: #@ 'tas-' + v["version_slug"] + '/metadata'
     format: json
     load_var: pooled-env
   - task: check-opsman-status
@@ -313,10 +313,10 @@ jobs:
         context: check-opsman-status
         path: bbr-pipeline-tasks-repo
         status: success
-  - put: tas-2-11
+  - put: #@ 'tas-' + v["version_slug"]
     params:
       action: unclaim
-      env_file: tas-2-11/metadata
+      env_file: #@ 'tas-' + v["version_slug"] + '/metadata'
 #@ end
 
 resource_types:
@@ -386,9 +386,11 @@ resources:
     stop: 11:00 PM
     days: [Monday, Tuesday, Wednesday, Thursday, Friday]
 
-- name: tas-2-11
+#@ for v in tas_versions:
+- name: #@ 'tas-' + v["version_slug"]
   type: pcf-pool
   source:
     api_token: ((toolsmiths.api_token))
     hostname: environments.toolsmiths.cf-app.com
-    pool_name: us_2_11_lts2
+    pool_name: #@ v["pool_name"]
+#@ end
