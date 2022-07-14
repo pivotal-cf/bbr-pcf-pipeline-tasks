@@ -387,7 +387,6 @@ resources:
     days: [Monday, Tuesday, Wednesday, Thursday, Friday]
 
 - name: tas-2-11
-  old_name: tas-lts
   type: pcf-pool
   source:
     api_token: ((toolsmiths.api_token))
