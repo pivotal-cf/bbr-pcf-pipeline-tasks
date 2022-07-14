@@ -7,7 +7,8 @@ s3_credentials: &s3_credentials
   endpoint: ((storage.endpoint))
 
 jobs:
-- name: claim-env
+- name: claim-env-2-11
+  old_name: claim-env
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
@@ -19,19 +20,20 @@ jobs:
       params:
         action: claim
 
-- name: validate-sample-pipeline
+- name: validate-sample-pipeline-2-11
+  old_name: validate-sample-pipeline
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env]
+      passed: [claim-env-2-11]
     - get: six-hours
       trigger: true
-      passed: [claim-env]
+      passed: [claim-env-2-11]
     - get: tas-lts
       trigger: true
-      passed: [claim-env]
+      passed: [claim-env-2-11]
   - put: bbr-pipeline-tasks-repo
     params:
       context: validation-of-sample-pas-pipeline
@@ -57,20 +59,21 @@ jobs:
         path: bbr-pipeline-tasks-repo
         status: success
 
-- name: export-om-installation
+- name: export-om-installation-2-11
+  old_name: export-om-installation
   serial: true
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env]
+      passed: [claim-env-2-11]
     - get: six-hours
       trigger: true
-      passed: [claim-env]
+      passed: [claim-env-2-11]
     - get: tas-lts
       trigger: true
-      passed: [claim-env]
+      passed: [claim-env-2-11]
   - put: bbr-pipeline-tasks-repo
     params:
       context: export-om-installation
@@ -102,20 +105,21 @@ jobs:
     params:
       file: om-installation/installation_*.zip
 
-- name: bbr-backup-pas
+- name: bbr-backup-pas-2-11
+  old_name: bbr-backup-pas
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env]
+      passed: [claim-env-2-11]
     - get: bbr-release
     - get: six-hours
       trigger: true
-      passed: [claim-env]
+      passed: [claim-env-2-11]
     - get: tas-lts
       trigger: true
-      passed: [claim-env]
+      passed: [claim-env-2-11]
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-pas
@@ -151,20 +155,21 @@ jobs:
       params:
         <<: *opsman_credentials
 
-- name: bbr-backup-director
+- name: bbr-backup-director-2-11
+  old_name: bbr-backup-director
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env]
+      passed: [claim-env-2-11]
     - get: bbr-release
     - get: six-hours
       trigger: true
-      passed: [claim-env]
+      passed: [claim-env-2-11]
     - get: tas-lts
       trigger: true
-      passed: [claim-env]
+      passed: [claim-env-2-11]
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-director
@@ -200,7 +205,8 @@ jobs:
       params:
         <<: *opsman_credentials
 
-- name: check-opsman-status
+- name: check-opsman-status-2-11
+  old_name: check-opsman-status
   serial: true
   plan:
   - in_parallel:
@@ -208,24 +214,24 @@ jobs:
       trigger: true
       version: every
       passed:
-      - validate-sample-pipeline
-      - export-om-installation
-      - bbr-backup-director
-      - bbr-backup-pas
+      - validate-sample-pipeline-2-11
+      - export-om-installation-2-11
+      - bbr-backup-director-2-11
+      - bbr-backup-pas-2-11
     - get: six-hours
       trigger: true
       passed:
-      - validate-sample-pipeline
-      - export-om-installation
-      - bbr-backup-director
-      - bbr-backup-pas
+      - validate-sample-pipeline-2-11
+      - export-om-installation-2-11
+      - bbr-backup-director-2-11
+      - bbr-backup-pas-2-11
     - get: tas-lts
       trigger: true
       passed:
-      - validate-sample-pipeline
-      - export-om-installation
-      - bbr-backup-director
-      - bbr-backup-pas
+      - validate-sample-pipeline-2-11
+      - export-om-installation-2-11
+      - bbr-backup-director-2-11
+      - bbr-backup-pas-2-11
   - put: bbr-pipeline-tasks-repo
     params:
       context: check-opsman-status
