@@ -2,6 +2,8 @@
 #! to set pipeline run: fly set-pipeline -p "pas-pipeline-tasks" -c <(ytt -f "ci/pipelines/pas-pipeline-tasks/pipeline.yml")
 
 #@ tas_versions = [
+#@   {"version_slug": "2-13", "pool_name": "us_2_13" },
+#@   {"version_slug": "2-12", "pool_name": "us_2_12" },
 #@   {"version_slug": "2-11", "pool_name": "us_2_11_lts2" },
 #@ ]
 
