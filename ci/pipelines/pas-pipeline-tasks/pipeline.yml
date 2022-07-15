@@ -1,4 +1,12 @@
 ---
+#! to set pipeline run: fly set-pipeline -p "pas-pipeline-tasks" -c <(ytt -f "ci/pipelines/pas-pipeline-tasks/pipeline.yml")
+
+#@ tas_versions = [
+#@   {"version_slug": "2-13", "pool_name": "us_2_13" },
+#@   {"version_slug": "2-12", "pool_name": "us_2_12" },
+#@   {"version_slug": "2-11", "pool_name": "us_2_11_lts2" },
+#@ ]
+
 s3_credentials: &s3_credentials
   bucket: ((storage.backup-bucket))
   region_name: ((storage.region))
@@ -7,7 +15,8 @@ s3_credentials: &s3_credentials
   endpoint: ((storage.endpoint))
 
 jobs:
-- name: claim-env
+#@ for v in tas_versions:
+- name: #@ 'claim-env-' + v["version_slug"]
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
@@ -15,23 +24,26 @@ jobs:
       version: every
     - get: six-hours
       trigger: true
-    - put: tas-lts
+    - put: #@ 'tas-' + v["version_slug"]
       params:
         action: claim
 
-- name: validate-sample-pipeline
+- name: #@ 'validate-sample-pipeline-' + v["version_slug"]
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: six-hours
       trigger: true
-      passed: [claim-env]
-    - get: tas-lts
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
-      passed: [claim-env]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: validation-of-sample-pas-pipeline
@@ -57,26 +69,29 @@ jobs:
         path: bbr-pipeline-tasks-repo
         status: success
 
-- name: export-om-installation
+- name: #@ 'export-om-installation-' + v["version_slug"]
   serial: true
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: six-hours
       trigger: true
-      passed: [claim-env]
-    - get: tas-lts
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
-      passed: [claim-env]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: export-om-installation
       path: bbr-pipeline-tasks-repo
       status: pending
-  - file: tas-lts/metadata
+  - file: #@ 'tas-' + v["version_slug"] + '/metadata'
     format: json
     load_var: pooled-env
   - task: export-om-installation
@@ -102,26 +117,29 @@ jobs:
     params:
       file: om-installation/installation_*.zip
 
-- name: bbr-backup-pas
+- name: #@ 'bbr-backup-pas-' + v["version_slug"]
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: bbr-release
     - get: six-hours
       trigger: true
-      passed: [claim-env]
-    - get: tas-lts
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
-      passed: [claim-env]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-pas
       path: bbr-pipeline-tasks-repo
       status: pending
-  - file: tas-lts/metadata
+  - file: #@ 'tas-' + v["version_slug"] + '/metadata'
     format: json
     load_var: pooled-env
   - task: extract-binary
@@ -151,26 +169,29 @@ jobs:
       params:
         <<: *opsman_credentials
 
-- name: bbr-backup-director
+- name: #@ 'bbr-backup-director-' + v["version_slug"]
   plan:
   - in_parallel:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed: [claim-env]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
     - get: bbr-release
     - get: six-hours
       trigger: true
-      passed: [claim-env]
-    - get: tas-lts
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
-      passed: [claim-env]
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: bbr-backup-director
       path: bbr-pipeline-tasks-repo
       status: pending
-  - file: tas-lts/metadata
+  - file: #@ 'tas-' + v["version_slug"] + '/metadata'
     format: json
     load_var: pooled-env
   - task: extract-binary
@@ -200,7 +221,7 @@ jobs:
       params:
         <<: *opsman_credentials
 
-- name: check-opsman-status
+- name: #@ 'check-opsman-status-' + v["version_slug"]
   serial: true
   plan:
   - in_parallel:
@@ -208,30 +229,30 @@ jobs:
       trigger: true
       version: every
       passed:
-      - validate-sample-pipeline
-      - export-om-installation
-      - bbr-backup-director
-      - bbr-backup-pas
+      - #@ 'validate-sample-pipeline-' + v["version_slug"]
+      - #@ 'export-om-installation-' + v["version_slug"]
+      - #@ 'bbr-backup-director-' + v["version_slug"]
+      - #@ 'bbr-backup-pas-' + v["version_slug"]
     - get: six-hours
       trigger: true
       passed:
-      - validate-sample-pipeline
-      - export-om-installation
-      - bbr-backup-director
-      - bbr-backup-pas
-    - get: tas-lts
+      - #@ 'validate-sample-pipeline-' + v["version_slug"]
+      - #@ 'export-om-installation-' + v["version_slug"]
+      - #@ 'bbr-backup-director-' + v["version_slug"]
+      - #@ 'bbr-backup-pas-' + v["version_slug"]
+    - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
-      - validate-sample-pipeline
-      - export-om-installation
-      - bbr-backup-director
-      - bbr-backup-pas
+      - #@ 'validate-sample-pipeline-' + v["version_slug"]
+      - #@ 'export-om-installation-' + v["version_slug"]
+      - #@ 'bbr-backup-director-' + v["version_slug"]
+      - #@ 'bbr-backup-pas-' + v["version_slug"]
   - put: bbr-pipeline-tasks-repo
     params:
       context: check-opsman-status
       path: bbr-pipeline-tasks-repo
       status: pending
-  - file: tas-lts/metadata
+  - file: #@ 'tas-' + v["version_slug"] + '/metadata'
     format: json
     load_var: pooled-env
   - task: check-opsman-status
@@ -294,10 +315,18 @@ jobs:
         context: check-opsman-status
         path: bbr-pipeline-tasks-repo
         status: success
-  - put: tas-lts
+
+- name: #@ 'unclaim-env-' + v["version_slug"]
+  plan:
+  - get: #@ 'tas-' + v["version_slug"]
+    passed:
+    - #@ 'check-opsman-status-' + v["version_slug"]
+    trigger: true
+  - put: #@ 'tas-' + v["version_slug"]
     params:
       action: unclaim
-      env_file: tas-lts/metadata
+      env_file: #@ 'tas-' + v["version_slug"] + '/metadata'
+#@ end
 
 resource_types:
 - name: pivnet
@@ -366,10 +395,12 @@ resources:
     stop: 11:00 PM
     days: [Monday, Tuesday, Wednesday, Thursday, Friday]
 
-- name: tas-lts
+#@ for v in tas_versions:
+- name: #@ 'tas-' + v["version_slug"]
   type: pcf-pool
   source:
     workaround: pas-pipeline-tasks #! https://www.pivotaltracker.com/story/show/182523309
     api_token: ((toolsmiths.api_token))
     hostname: environments.toolsmiths.cf-app.com
-    pool_name: us_2_11_lts2
+    pool_name: #@ v["pool_name"]
+#@ end
