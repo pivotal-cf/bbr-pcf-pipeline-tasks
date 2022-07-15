@@ -369,6 +369,7 @@ resources:
 - name: tas-lts
   type: pcf-pool
   source:
+    workaround: pas-pipeline-tasks #! https://www.pivotaltracker.com/story/show/182523309
     api_token: ((toolsmiths.api_token))
     hostname: environments.toolsmiths.cf-app.com
     pool_name: us_2_11_lts2
