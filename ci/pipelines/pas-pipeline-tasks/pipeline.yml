@@ -77,7 +77,7 @@ jobs:
       - lint-pipeline
       trigger: true
       version: every
-    - get: six-hours
+    - get: once-a-week
       trigger: true
     - put: #@ 'tas-' + v["version_slug"]
       attempts: *number_of_claim_env_retries
@@ -96,7 +96,7 @@ jobs:
       version: every
       passed:
       - #@ 'claim-env-' + v["version_slug"]
-    - get: six-hours
+    - get: once-a-week
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
@@ -140,7 +140,7 @@ jobs:
       version: every
       passed:
       - #@ 'claim-env-' + v["version_slug"]
-    - get: six-hours
+    - get: once-a-week
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
@@ -187,7 +187,7 @@ jobs:
       passed:
       - #@ 'claim-env-' + v["version_slug"]
     - get: bbr-release
-    - get: six-hours
+    - get: once-a-week
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
@@ -244,7 +244,7 @@ jobs:
       passed:
       - #@ 'claim-env-' + v["version_slug"]
     - get: bbr-release
-    - get: six-hours
+    - get: once-a-week
       trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
@@ -303,7 +303,7 @@ jobs:
       - #@ 'export-om-installation-' + v["version_slug"]
       - #@ 'bbr-backup-director-' + v["version_slug"]
       - #@ 'bbr-backup-pas-' + v["version_slug"]
-    - get: six-hours
+    - get: once-a-week
       trigger: true
       passed:
       - #@ 'validate-sample-pipeline-' + v["version_slug"]
@@ -486,13 +486,10 @@ resources:
     api_token: *pivnet_api_token
     product_slug: p-bosh-backup-and-restore
 
-- name: six-hours
+- name: once-a-week
   type: time
   source:
-    interval: 6h
-    start: 9:00 AM
-    stop: 11:00 PM
-    days: [Monday, Tuesday, Wednesday, Thursday, Friday]
+    days: [Monday]
 
 #@ for v in data.values.tas_versions:
 - name: #@ 'tas-' + v["version_slug"]
