@@ -88,6 +88,46 @@ jobs:
         resource: #@ 'tas-' + v["version_slug"]
         timeout: 6h
 
+- name: #@ 'resize-director-and-control-vm-' + v["version_slug"]
+  plan:
+  - in_parallel:
+    - get: bbr-pipeline-tasks-repo
+      passed: 
+      - #@ 'claim-env-' + v["version_slug"]
+      trigger: true
+      version: every
+    - get: #@ 'tas-' + v["version_slug"]
+      trigger: true
+      passed:
+      - #@ 'claim-env-' + v["version_slug"]
+  - get: image-cryogenics-essentials
+  - task: resize-vms-to-avoid-timeouts
+    image: image-cryogenics-essentials
+    config:
+      platform: linux
+      inputs:
+      - name: bbr-pipeline-tasks-repo
+      - name: #@ 'tas-' + v["version_slug"]
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          set -eu
+          . <(smith -l tas-*/metadata om)
+          CF_GUID="$(om curl -p /api/v0/staged/products | jq -r '.[] | select(.type == "cf").guid')"
+          CONTROL_JOB_ID=$(om curl  -p /api/v0/staged/products/$CF_GUID/jobs | jq -r '.jobs[] | select(.name=="control").guid ')
+          VM_TYPE="$(om curl -p /api/v0/vm_types | jq -r '[ .vm_types[] | select( .cpu >= 4 and .ephemeral_disk >= 50000 )][0].name')"
+          UPDATE_CONFIG=$(om curl  -p /api/v0/staged/products/$CF_GUID/jobs/$CONTROL_JOB_ID/resource_config | jq ".instance_type.id = \"$VM_TYPE\"")
+          om curl -x PUT -p /api/v0/staged/products/$CF_GUID/jobs/$CONTROL_JOB_ID/resource_config -d "$UPDATE_CONFIG"
+          
+          BOSH_GUID="$(om curl -p /api/v0/staged/products | jq -r '.[] | select(.type == "p-bosh").guid')"
+          DIRECTOR_JOB_ID=$(om curl  -p /api/v0/staged/products/$BOSH_GUID/jobs | jq -r '.jobs[] | select(.name=="director").guid ')
+          UPDATE_CONFIG=$(om curl  -p /api/v0/staged/products/$BOSH_GUID/jobs/$DIRECTOR_JOB_ID/resource_config | jq ".instance_type.id = \"$VM_TYPE\"")
+          om curl -x PUT -p /api/v0/staged/products/$BOSH_GUID/jobs/$DIRECTOR_JOB_ID/resource_config -d "$UPDATE_CONFIG"
+
+          om apply-changes
+  
 - name: #@ 'validate-sample-pipeline-' + v["version_slug"]
   plan:
   - in_parallel:
@@ -95,15 +135,11 @@ jobs:
       trigger: true
       version: every
       passed:
-      - #@ 'claim-env-' + v["version_slug"]
-    - get: once-a-week
-      trigger: true
-      passed:
-      - #@ 'claim-env-' + v["version_slug"]
+      - #@ 'resize-director-and-control-vm-' + v["version_slug"]
     - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
-      - #@ 'claim-env-' + v["version_slug"]
+      - #@ 'resize-director-and-control-vm-' + v["version_slug"]
     - get: image-cryogenics-essentials
   - put: bbr-pipeline-tasks-repo
     params:
@@ -187,14 +223,10 @@ jobs:
       passed:
       - #@ 'claim-env-' + v["version_slug"]
     - get: bbr-release
-    - get: once-a-week
-      trigger: true
-      passed:
-      - #@ 'claim-env-' + v["version_slug"]
     - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
-      - #@ 'claim-env-' + v["version_slug"]
+      - #@ 'resize-director-and-control-vm-' + v["version_slug"]
     - get: image-cryogenics-essentials
   - put: bbr-pipeline-tasks-repo
     params:
@@ -242,16 +274,12 @@ jobs:
       trigger: true
       version: every
       passed:
-      - #@ 'claim-env-' + v["version_slug"]
+      - #@ 'resize-director-and-control-vm-' + v["version_slug"]
     - get: bbr-release
-    - get: once-a-week
-      trigger: true
-      passed:
-      - #@ 'claim-env-' + v["version_slug"]
     - get: #@ 'tas-' + v["version_slug"]
       trigger: true
       passed:
-      - #@ 'claim-env-' + v["version_slug"]
+      - #@ 'resize-director-and-control-vm-' + v["version_slug"]
     - get: image-cryogenics-essentials
   - put: bbr-pipeline-tasks-repo
     params:
@@ -298,13 +326,6 @@ jobs:
     - get: bbr-pipeline-tasks-repo
       trigger: true
       version: every
-      passed:
-      - #@ 'validate-sample-pipeline-' + v["version_slug"]
-      - #@ 'export-om-installation-' + v["version_slug"]
-      - #@ 'bbr-backup-director-' + v["version_slug"]
-      - #@ 'bbr-backup-pas-' + v["version_slug"]
-    - get: once-a-week
-      trigger: true
       passed:
       - #@ 'validate-sample-pipeline-' + v["version_slug"]
       - #@ 'export-om-installation-' + v["version_slug"]
