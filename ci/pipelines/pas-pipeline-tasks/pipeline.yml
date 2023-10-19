@@ -479,6 +479,7 @@ jobs:
 - name: merge-pr
   plan:
   - get: bbr-pipeline-tasks-repo
+    trigger: true
     passed:
     #@ for v in data.values.tas_versions:
     - #@ 'unclaim-env-' + v["version_slug"]
