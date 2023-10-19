@@ -159,7 +159,6 @@ jobs:
       trigger: true
       version: every
     - get: #@ 'tas-' + v["version_slug"]
-      trigger: true
       passed:
       - #@ 'claim-env-' + v["version_slug"]
   - get: image-cryogenics-essentials
@@ -279,7 +278,7 @@ jobs:
       trigger: true
       version: every
       passed:
-      - #@ 'claim-env-' + v["version_slug"]
+      - #@ 'resize-director-and-control-vm-' + v["version_slug"]
     - get: bbr-release
     - get: #@ 'tas-' + v["version_slug"]
       trigger: true
