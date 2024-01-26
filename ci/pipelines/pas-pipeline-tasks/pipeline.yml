@@ -114,7 +114,7 @@ jobs:
 
   - load_var: pr_branch_name
     file: branch_name/name
-  - put: bbr-pipeline-tasks-repo-main
+  - put: bbr-pipeline-tasks-repo-write
     params:
       repository: source-repo
       branch: "((.:pr_branch_name))"
@@ -123,7 +123,7 @@ jobs:
     file: cryogenics-concourse-tasks/github-automation/create-pr/task.yml
     image: image-cryogenics-essentials
     input_mapping:
-      source-repo: bbr-pipeline-tasks-repo-main
+      source-repo: bbr-pipeline-tasks-repo-write
     params:
       GH_TOKEN: *git_access_token
       BASE: main
@@ -541,6 +541,16 @@ resources:
     uri: git@github.com:pivotal-cf/bbr-pcf-pipeline-tasks
     private_key: *github_ssh_key
     branch: main
+
+- name: bbr-pipeline-tasks-repo-write
+  type: git
+  icon: github
+  source:
+    uri: git@github.com:pivotal-cf/bbr-pcf-pipeline-tasks
+    private_key: *github_ssh_key
+    commit_filter:
+      exclude:
+      - ;resource comment; This resource is used exclusively for pushing new changes
 
 - name: image-cryogenics-essentials
   type: registry-image
