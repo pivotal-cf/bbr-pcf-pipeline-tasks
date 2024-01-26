@@ -525,12 +525,14 @@ resources:
   type: registry-image
   source:
     repository: harbor-repo.vmware.com/dockerhub-proxy-cache/library/bash
+
 - name: cryogenics-concourse-tasks
   type: git
   icon: github
   source:
     uri: git@github.com:pivotal/cryogenics-concourse-tasks.git
     private_key: *github_ssh_key
+    branch: main
 
 - name: bbr-pipeline-tasks-repo-main
   type: git
@@ -538,6 +540,17 @@ resources:
   source:
     uri: git@github.com:pivotal-cf/bbr-pcf-pipeline-tasks
     private_key: *github_ssh_key
+    branch: main
+
+- name: bbr-pipeline-tasks-repo-write
+  type: git
+  icon: github
+  source:
+    uri: git@github.com:pivotal-cf/bbr-pcf-pipeline-tasks
+    private_key: *github_ssh_key
+    commit_filter:
+      exclude:
+      - ;resource comment; This resource is used exclusively for pushing new changes
 
 - name: image-cryogenics-essentials
   type: registry-image
