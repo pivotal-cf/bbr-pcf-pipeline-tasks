@@ -1,4 +1,9 @@
-FROM ubuntu:xenial
+ARG REGISTRY=docker.io
+ARG BASE_IMAGE=ubuntu:latest
+# as of 2024/03/28, comment taken from https://hub.docker.com/_/ubuntu h1: "What's in this image?"
+# The ubuntu:latest tag points to the "latest LTS", since that's the version recommended for general use. The ubuntu:rolling tag points to the latest release (regardless of LTS status).
+# additionally the FROM is parametrized so we can provide the base image layer without the implicit docker pull at build time.This avoid docker rate limitation in CI
+FROM ${REGISTRY}/${BASE_IMAGE}
 
 RUN apt-get update && apt-get install -y \
   openssh-client \
