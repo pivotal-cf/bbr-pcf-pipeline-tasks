@@ -508,6 +508,8 @@ resource_types:
   type: registry-image
   source:
     repository: frodenas/gcs-resource
+    username: ((docker.username))
+    password: ((docker.password))
 
 resources:
 - name: image-bbr-pipeline-tasks
