@@ -487,12 +487,16 @@ resource_types:
 - name: pivnet
   type: registry-image
   source:
-    repository: harbor-repo.vmware.com/dockerhub-proxy-cache/pivotalcf/pivnet-resource
+    repository: pivotalcf/pivnet-resource
+    username: ((docker.username))
+    password: ((docker.password))
     tag: latest-final
 - name: pull-request
   type: registry-image
   source:
-    repository: harbor-repo.vmware.com/dockerhub-proxy-cache/cryogenics/pr-queue-resource
+    repository: cryogenics/pr-queue-resource
+    username: ((docker.username))
+    password: ((docker.password))
 
 - name: shepherd
   source:
@@ -508,7 +512,9 @@ resource_types:
 resources:
 - name: image-bbr-pipeline-tasks
   source:
-    repository: harbor-repo.vmware.com/dockerhub-proxy-cache/pcfplatformrecovery/bbr-pcf-pipeline-tasks
+    repository: pcfplatformrecovery/bbr-pcf-pipeline-tasks
+    username: ((docker.username))
+    password: ((docker.password))
     tag: final
   type: registry-image
 
@@ -541,7 +547,9 @@ resources:
 - name: image-cryogenics-essentials
   type: registry-image
   source:
-    repository: harbor-repo.vmware.com/dockerhub-proxy-cache/cryogenics/essentials
+    repository: cryogenics/essentials
+    username: ((docker.username))
+    password: ((docker.password))
 
 - name: bbr-pipeline-tasks-repo
   type: pull-request
