@@ -66,8 +66,8 @@ jobs:
       - name: branch_name
       - name: source-repo
       params:
-        COMMIT_USERNAME: Cryogenics CI Bot
-        COMMIT_USEREMAIL: mapbu-cryogenics@groups.vmware.com
+        COMMIT_USERNAME: Tas Operability Bot
+        COMMIT_USEREMAIL: tas-operability.pdl@broadcom.com
       run:
         path: /bin/bash
         args:
@@ -108,7 +108,7 @@ jobs:
       LABELS: ci-trigger
       TITLE: ci-((.:pr_branch_name))
       MESSAGE: |
-        This is an automatically generated Pull Request from the Cryogenics CI Bot.
+        This is an automatically generated Pull Request from the Tas Operability Bot.
         It is used to automatically create a PR against this repo to regularly trigger
         CI to test the tasks against new TAS Versions
 
@@ -610,7 +610,7 @@ resources:
     service-account-key: *shepherd_sa_key
     compatibility-mode: environments-app
     lease:
-      namespace: cryogenics
+      namespace: tas-operability
       pool:
         namespace: official
         name: #@ v["pool_name"]
