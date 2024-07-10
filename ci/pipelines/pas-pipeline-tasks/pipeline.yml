@@ -23,6 +23,9 @@ secrets:
   bucket: ((om-backup-artifact.backup-bucket))
   json_key: ((om-backup-artifact.gcs-json-key))
 
+- &docker_creds
+  username: ((docker.username))
+  password: ((docker.password))
 
 #! **************
 #! End of secrets
@@ -487,16 +490,14 @@ resource_types:
 - name: pivnet
   type: registry-image
   source:
+    <<: *docker_creds
     repository: pivotalcf/pivnet-resource
-    username: ((docker.username))
-    password: ((docker.password))
     tag: latest-final
 - name: pull-request
   type: registry-image
   source:
+    <<: *docker_creds
     repository: cryogenics/pr-queue-resource
-    username: ((docker.username))
-    password: ((docker.password))
 
 - name: shepherd
   source:
@@ -507,16 +508,14 @@ resource_types:
 - name: gcs
   type: registry-image
   source:
+    <<: *docker_creds
     repository: frodenas/gcs-resource
-    username: ((docker.username))
-    password: ((docker.password))
 
 resources:
 - name: image-bbr-pipeline-tasks
   source:
+    <<: *docker_creds
     repository: pcfplatformrecovery/bbr-pcf-pipeline-tasks
-    username: ((docker.username))
-    password: ((docker.password))
     tag: final
   type: registry-image
 
@@ -549,9 +548,8 @@ resources:
 - name: image-cryogenics-essentials
   type: registry-image
   source:
+    <<: *docker_creds
     repository: cryogenics/essentials
-    username: ((docker.username))
-    password: ((docker.password))
 
 - name: bbr-pipeline-tasks-repo
   type: pull-request
